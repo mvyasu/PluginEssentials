@@ -13,8 +13,6 @@ local StudioComponentsUtil = StudioComponents:FindFirstChild("Util")
 local TextInput = require(StudioComponents.TextInput)
 
 local getState = require(StudioComponentsUtil.getState)
-local themeProvider = require(StudioComponentsUtil.themeProvider)
-local constants = require(StudioComponentsUtil.constants)
 local unwrap = require(StudioComponentsUtil.unwrap)
 local types = require(StudioComponentsUtil.types)
 
