@@ -22,7 +22,7 @@ local Computed = Fusion.Computed
 local OnEvent = Fusion.OnEvent
 local Hydrate = Fusion.Hydrate
 
-local INITIAL_PROPERTIES = {
+local COMPONENT_ONLY_PROPERTIES = {
 	"TextColorStyle",
 	"BackgroundColorStyle",
 	"BorderColorStyle",
@@ -30,12 +30,14 @@ local INITIAL_PROPERTIES = {
 	"Enabled",
 }
 
+type styleGuideColorInput = (Enum.StudioStyleGuideColor | types.StateObject<Enum.StudioStyleGuideColor>)?
+
 export type BaseButtonProperties = {
 	Activated: (() -> nil)?,
 	Enabled: (boolean | types.StateObject<boolean>)?,
-	TextColorStyle: Enum.StudioStyleGuideColor?,
-	BackgroundColorStyle: Enum.StudioStyleGuideColor?,
-	BorderColorStyle: Enum.StudioStyleGuideColor?,
+	TextColorStyle: styleGuideColorInput,
+	BackgroundColorStyle: styleGuideColorInput,
+	BorderColorStyle: styleGuideColorInput,
 	[any]: any,
 }
 
@@ -61,57 +63,55 @@ return function(props: BaseButtonProperties): TextButton
 		return Enum.StudioStyleGuideModifier.Default
 	end)
 	
-	local onActivated = props.Activated
-	
-	local newBaseButton = New "TextButton" {
-		Name = "BaseButton",
-		Size = UDim2.fromScale(1, 1),
-		Text = "Button",
-		Font = themeProvider:GetFont("Default"),
-		TextSize = constants.TextSize,
-		TextColor3 = themeProvider:GetColor(props.TextColorStyle or Enum.StudioStyleGuideColor.ButtonText, modifier),
-		BackgroundColor3 = themeProvider:GetColor(props.BackgroundColorStyle or Enum.StudioStyleGuideColor.Button, modifier),
-		AutoButtonColor = false,
+	local newBaseButton = BoxBorder {
+		Color = themeProvider:GetColor(props.BorderColorStyle or Enum.StudioStyleGuideColor.CheckedFieldBorder, modifier),
 		
-		[OnEvent "InputBegan"] = function(inputObject)
-			if not isEnabled:get() then
-				return
-			elseif inputObject.UserInputType == Enum.UserInputType.MouseMovement then
-				isHovering:set(true)
-			elseif inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
-				isPressed:set(true)
-			end
-		end,
-		[OnEvent "InputEnded"] = function(inputObject)
-			if not isEnabled:get() then
-				return
-			elseif inputObject.UserInputType == Enum.UserInputType.MouseMovement then
-				isHovering:set(false)
-			elseif inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
-				isPressed:set(false)
-			end
-		end,
-		[OnEvent "Activated"] = (function()
-			if onActivated then
-				return function()
-					if isEnabled:get() then
-						isHovering:set(false)
-						isPressed:set(false)
-						onActivated()
+		[Children] = New "TextButton" {
+			Name = "BaseButton",
+			Size = UDim2.fromScale(1, 1),
+			Text = "Button",
+			Font = themeProvider:GetFont("Default"),
+			TextSize = constants.TextSize,
+			TextColor3 = themeProvider:GetColor(props.TextColorStyle or Enum.StudioStyleGuideColor.ButtonText, modifier),
+			BackgroundColor3 = themeProvider:GetColor(props.BackgroundColorStyle or Enum.StudioStyleGuideColor.Button, modifier),
+			AutoButtonColor = false,
+
+			[OnEvent "InputBegan"] = function(inputObject)
+				if not unwrap(isEnabled) then
+					return
+				elseif inputObject.UserInputType == Enum.UserInputType.MouseMovement then
+					isHovering:set(true)
+				elseif inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
+					isPressed:set(true)
+				end
+			end,
+			[OnEvent "InputEnded"] = function(inputObject)
+				if not unwrap(isEnabled) then
+					return
+				elseif inputObject.UserInputType == Enum.UserInputType.MouseMovement then
+					isHovering:set(false)
+				elseif inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
+					isPressed:set(false)
+				end
+			end,
+			[OnEvent "Activated"] = (function()
+				if props.Activated then
+					return function()
+						if unwrap(isEnabled, false) then
+							isHovering:set(false)
+							isPressed:set(false)
+							props.Activated()
+						end
 					end
 				end
-			end
-		end)(),
+			end)(),
+		}
 	}
 	
 	local hydrateProps = table.clone(props)
-	for _,propertyIndex in pairs(INITIAL_PROPERTIES) do
+	for _,propertyIndex in pairs(COMPONENT_ONLY_PROPERTIES) do
 		hydrateProps[propertyIndex] = nil
 	end
-
-	BoxBorder(newBaseButton, {
-		Color = themeProvider:GetColor(Enum.StudioStyleGuideColor.CheckedFieldBorder, modifier)
-	})
 	
 	return Hydrate(newBaseButton)(hydrateProps)
 end

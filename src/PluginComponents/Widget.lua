@@ -3,7 +3,7 @@ local Fusion = require(Plugin:FindFirstChild("Fusion", true))
 
 local Hydrate = Fusion.Hydrate
 
-local INITIAL_PROPERTIES = {
+local COMPONENT_ONLY_PROPERTIES = {
 	"Id",
 	"InitialDockTo",
 	"InitialEnabled",
@@ -36,7 +36,7 @@ return function(props: PluginGuiProperties)
 		)
 	)
 
-	for _,propertyName in pairs(INITIAL_PROPERTIES) do
+	for _,propertyName in pairs(COMPONENT_ONLY_PROPERTIES) do
 		props[propertyName] = nil
 	end
 

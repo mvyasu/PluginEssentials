@@ -25,7 +25,7 @@ local Observer = Fusion.Observer
 local Cleanup = Fusion.Cleanup
 local Ref = Fusion.Ref
 
-local INITIAL_PROPERTIES = {
+local COMPONENT_ONLY_PROPERTIES = {
 	"ZIndex",
 	"Enabled",
 	"OnChange",
@@ -44,7 +44,7 @@ type ColorPickerProperties = {
 }
 
 return function(props: ColorPickerProperties): Frame
-	local listDisplayMode = getState(props.ListDisplayMode, true)
+	local listDisplayMode = getState(props.ListDisplayMode, Enum.ListDisplayMode.Horizontal)
 	
 	local isEnabled = getState(props.Enabled, true)
 	local isHovering = Value(false)
@@ -129,127 +129,131 @@ return function(props: ColorPickerProperties): Frame
 		end,
 		
 		[Children] = {
-			BoxBorder(New "TextButton" {
-				Name = "Slider",
-				Active = false,
-				AutoButtonColor = false,
-				Text = "",
-				Size = Computed(function()
-					if unwrap( isHorizontalList) then
-						return UDim2.new(0, 14, 1, 0)
-					end
-					return UDim2.new(1, 0, 0, 14)
-				end),
-				AnchorPoint = Computed(function()
-					if unwrap( isHorizontalList) then
-						return Vector2.new(1, 0)
-					end
-					return Vector2.new(0, 1)
-				end),
-				Position = Computed(function()
-					if unwrap( isHorizontalList) then
-						return UDim2.new(1, -6, 0, 0)
-					end
-					return UDim2.new(0, 0, 1, -6)
-				end),
-				BorderSizePixel = 0,
-				BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-				[Ref] = sliderRef,
-				
-				[Children] = {
-					New "UIGradient" {
-						Name = "Gradient",
-						Color = Computed(function()
-							local isEnabled = unwrap(isEnabled)
-							local hue, sat, val = unwrap(currentColor):ToHSV()
-							return ColorSequence.new(Color3.fromRGB(0, 0, 0), Color3.fromHSV(hue, sat, if isEnabled then 1 else .5))
-						end),
-						Rotation = Computed(function()
-							if unwrap( isHorizontalList) then
-								return -90
-							end
-							return 0
-						end),
-					},
-					New "ImageLabel" {
-						Name = "Arrow",
-						AnchorPoint = Computed(function()
-							if unwrap( isHorizontalList) then
-								return Vector2.new(0, .5)
-							end
-							return Vector2.new(.5, 0)
-						end),
-						Size = UDim2.fromOffset(5, 9),
-						Rotation = Computed(function()
-							if unwrap( isHorizontalList) then
-								return 0
-							end
-							return 90
-						end),
-						Position = Computed(function()
-							local scale = 1 - select(3, unwrap(currentColor):ToHSV())
-							if unwrap( isHorizontalList) then
-								return UDim2.new(1, 1, scale, 0)
-							end
-							return UDim2.new(1-scale, 0, 1, 1)
-						end),
-						BackgroundTransparency = 1,
-						Image = "rbxassetid://7507468017",
-						ImageColor3 = themeProvider:GetColor(Enum.StudioStyleGuideColor.TitlebarText),
-					}
-				}
-			}),
-			BoxBorder(New "ImageButton" {
-				Name = "Region",
-				Active = false,
-				AutoButtonColor = false,
-				Size = Computed(function()
-					if unwrap( isHorizontalList) then
-						return UDim2.new(1, -30, 1, 0)
-					end
-					return UDim2.new(1, 0, 1, -30)
-				end),
-				Image = "rbxassetid://2752294886",
-				ImageColor3 = Computed(function()
-					return Color3.fromHSV(0, 0, if unwrap(isEnabled) then 1 else .5)
-				end),
-				ClipsDescendants = true,
-				BorderSizePixel = 0,
-				[Ref] = regionRef,
-				
-				[Children] = New "Frame" {
-					Name = "Indicator",
-					AnchorPoint = Vector2.new(0.5, 0.5),
-					Position = Computed(function()
-						local hue, sat, val = unwrap(currentColor):ToHSV()
-						return UDim2.new(1 - hue, 1, 1 - sat, 0)
+			BoxBorder {
+				[Children] = New "TextButton" {
+					Name = "Slider",
+					Active = false,
+					AutoButtonColor = false,
+					Text = "",
+					Size = Computed(function()
+						if unwrap( isHorizontalList) then
+							return UDim2.new(0, 14, 1, 0)
+						end
+						return UDim2.new(1, 0, 0, 14)
 					end),
-					Size = UDim2.fromOffset(19, 19),
-					BackgroundTransparency = 1,
-					
+					AnchorPoint = Computed(function()
+						if unwrap( isHorizontalList) then
+							return Vector2.new(1, 0)
+						end
+						return Vector2.new(0, 1)
+					end),
+					Position = Computed(function()
+						if unwrap( isHorizontalList) then
+							return UDim2.new(1, -6, 0, 0)
+						end
+						return UDim2.new(0, 0, 1, -6)
+					end),
+					BorderSizePixel = 0,
+					BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+					[Ref] = sliderRef,
+
 					[Children] = {
-						New "Frame" {
-							Name = "Vertical",	
-							Position = UDim2.fromOffset(8, 0),
-							Size = UDim2.new(0, 2, 1, 0),
-							BorderSizePixel = 0,
-							BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+						New "UIGradient" {
+							Name = "Gradient",
+							Color = Computed(function()
+								local isEnabled = unwrap(isEnabled)
+								local hue, sat, val = unwrap(currentColor):ToHSV()
+								return ColorSequence.new(Color3.fromRGB(0, 0, 0), Color3.fromHSV(hue, sat, if isEnabled then 1 else .5))
+							end),
+							Rotation = Computed(function()
+								if unwrap( isHorizontalList) then
+									return -90
+								end
+								return 0
+							end),
 						},
-						New "Frame" {
-							Name = "Horizontal",
-							Position = UDim2.fromOffset(0, 8),
-							Size = UDim2.new(1, 0, 0, 2),
-							BorderSizePixel = 0,
-							BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+						New "ImageLabel" {
+							Name = "Arrow",
+							AnchorPoint = Computed(function()
+								if unwrap( isHorizontalList) then
+									return Vector2.new(0, .5)
+								end
+								return Vector2.new(.5, 0)
+							end),
+							Size = UDim2.fromOffset(5, 9),
+							Rotation = Computed(function()
+								if unwrap( isHorizontalList) then
+									return 0
+								end
+								return 90
+							end),
+							Position = Computed(function()
+								local scale = 1 - select(3, unwrap(currentColor):ToHSV())
+								if unwrap( isHorizontalList) then
+									return UDim2.new(1, 1, scale, 0)
+								end
+								return UDim2.new(1-scale, 0, 1, 1)
+							end),
+							BackgroundTransparency = 1,
+							Image = "rbxassetid://7507468017",
+							ImageColor3 = themeProvider:GetColor(Enum.StudioStyleGuideColor.TitlebarText),
 						}
 					}
 				}
-			}),
+			},
+			BoxBorder {
+				[Children] = New "ImageButton" {
+					Name = "Region",
+					Active = false,
+					AutoButtonColor = false,
+					Size = Computed(function()
+						if unwrap( isHorizontalList) then
+							return UDim2.new(1, -30, 1, 0)
+						end
+						return UDim2.new(1, 0, 1, -30)
+					end),
+					Image = "rbxassetid://2752294886",
+					ImageColor3 = Computed(function()
+						return Color3.fromHSV(0, 0, if unwrap(isEnabled) then 1 else .5)
+					end),
+					ClipsDescendants = true,
+					BorderSizePixel = 0,
+					[Ref] = regionRef,
+
+					[Children] = New "Frame" {
+						Name = "Indicator",
+						AnchorPoint = Vector2.new(0.5, 0.5),
+						Position = Computed(function()
+							local hue, sat, val = unwrap(currentColor):ToHSV()
+							return UDim2.new(1 - hue, 1, 1 - sat, 0)
+						end),
+						Size = UDim2.fromOffset(19, 19),
+						BackgroundTransparency = 1,
+
+						[Children] = {
+							New "Frame" {
+								Name = "Vertical",	
+								Position = UDim2.fromOffset(8, 0),
+								Size = UDim2.new(0, 2, 1, 0),
+								BorderSizePixel = 0,
+								BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+							},
+							New "Frame" {
+								Name = "Horizontal",
+								Position = UDim2.fromOffset(0, 8),
+								Size = UDim2.new(1, 0, 0, 2),
+								BorderSizePixel = 0,
+								BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+							}
+						}
+					}
+				}
+			},
 		}
 	}
 	
 	local hydrateProps = table.clone(props)
-	for _,propertyIndex in pairs(INITIAL_PROPERTIES) do
+	for _,propertyIndex in pairs(COMPONENT_ONLY_PROPERTIES) do
 		hydrateProps[propertyIndex] = nil
 	end
 	

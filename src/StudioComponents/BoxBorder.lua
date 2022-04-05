@@ -19,9 +19,12 @@ local Hydrate = Fusion.Hydrate
 type BoxBorderProperties = {
 	Color: (Color3 | types.StateObject<Color3>)?,
 	Thickness: (number | types.StateObject<number>)?,
+	[types.Children]: GuiObject,
 }
 
-return function(frame: GuiObject, props: BoxBorderProperties?): GuiObject
+-- using [Children] to define the GuiObject is meant to give a more consistant format
+
+return function(props: BoxBorderProperties): GuiObject
 	local boxProps = props or {}
 	local borderColor = boxProps.Color or themeProvider:GetColor(Enum.StudioStyleGuideColor.Border)
 	
@@ -36,7 +39,7 @@ return function(frame: GuiObject, props: BoxBorderProperties?): GuiObject
 	}
 	
 	if unwrap(constants.CurvedBoxes) then
-		local backgroundTransparency = Value(frame.BackgroundTransparency)
+		local backgroundTransparency = Value(props[Children].BackgroundTransparency)
 		
 		hyrdateProps = {
 			[Children] = {
@@ -58,5 +61,5 @@ return function(frame: GuiObject, props: BoxBorderProperties?): GuiObject
 		}
 	end
 	
-	return Hydrate(frame)(hyrdateProps)
+	return Hydrate(props[Children])(hyrdateProps)
 end

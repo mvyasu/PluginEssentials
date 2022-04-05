@@ -19,7 +19,7 @@ local Hydrate = Fusion.Hydrate
 local Value = Fusion.Value
 local New = Fusion.New
 
-local INITIAL_PROPERTIES = {
+local COMPONENT_ONLY_PROPERTIES = {
 	"ZIndex",
 	"Enabled",
 	"DragBegan",
@@ -110,7 +110,7 @@ return function(props: ScrollBarHandleProperties): TextButton
 	}
 	
 	local hydrateProps = table.clone(props)
-	for _,propertyIndex in pairs(INITIAL_PROPERTIES) do
+	for _,propertyIndex in pairs(COMPONENT_ONLY_PROPERTIES) do
 		hydrateProps[propertyIndex] = nil
 	end
 	

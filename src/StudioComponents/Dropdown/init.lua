@@ -28,7 +28,7 @@ local Hydrate = Fusion.Hydrate
 local Value = Fusion.Value
 local New = Fusion.New
 
-local INITIAL_PROPERTIES = {
+local COMPONENT_ONLY_PROPERTIES = {
 	"Enabled",
 	"MaxVisibleItems",
 	"Items",
@@ -202,23 +202,25 @@ return function(props: DropdownProperties): Frame
 					end
 				end,
 			},
-			BoxBorder(New "TextLabel" {
-				Name = "Selected",
-				Size = UDim2.fromScale(1, 1),
-				BackgroundColor3 = themeProvider:GetColor(backgroundStyleGuideColor, modifier),
-				Text = selectedItem,
-				Font = themeProvider:GetFont("Default"),
-				TextSize = constants.TextSize,
-				TextColor3 = themeProvider:GetColor(Enum.StudioStyleGuideColor.MainText, modifier),
-				TextXAlignment = Enum.TextXAlignment.Left,
+			BoxBorder {
+				Color = themeProvider:GetColor(Enum.StudioStyleGuideColor.CheckedFieldBorder, modifier),
+				
+				[Children] = New "TextLabel" {
+					Name = "Selected",
+					Size = UDim2.fromScale(1, 1),
+					BackgroundColor3 = themeProvider:GetColor(backgroundStyleGuideColor, modifier),
+					Text = selectedItem,
+					Font = themeProvider:GetFont("Default"),
+					TextSize = constants.TextSize,
+					TextColor3 = themeProvider:GetColor(Enum.StudioStyleGuideColor.MainText, modifier),
+					TextXAlignment = Enum.TextXAlignment.Left,
 
-				[Children] = New "UIPadding" {
-					PaddingLeft = UDim.new(0, dropdownConstants.TextPaddingLeft),
-					PaddingRight = UDim.new(0, dropdownConstants.TextPaddingRight),
+					[Children] = New "UIPadding" {
+						PaddingLeft = UDim.new(0, dropdownConstants.TextPaddingLeft),
+						PaddingRight = UDim.new(0, dropdownConstants.TextPaddingRight),
+					}
 				}
-			}, {
-				Color = themeProvider:GetColor(Enum.StudioStyleGuideColor.CheckedFieldBorder, modifier)
-			}),
+			},
 			New "Frame" {
 				Name = "ArrowContainer",
 				AnchorPoint = Vector2.new(1, 0),
@@ -238,29 +240,31 @@ return function(props: DropdownProperties): Frame
 			},
 			Computed(function()
 				if unwrap(isOpen) then
-					return BoxBorder(ScrollFrame {
-						ZIndex = zIndex,
-						Name = "Drop",
-						BorderSizePixel = 0,
-						Position = UDim2.new(0, 0, 1, spaceBetweenTopAndDropdown),
-						Size = Computed(function()
-							return UDim2.new(1, 0, 0, unwrap(scrollHeight))
-						end),
-						Layout = New "UIListLayout" {
-							Padding = UDim.new(0, rowPadding),	
-						},
-						UIPadding = New "UIPadding" {
-							PaddingLeft = dropdownPadding,
-							PaddingRight = dropdownPadding,
-							PaddingTop = dropdownPadding,
-							PaddingBottom = dropdownPadding,
-						},
+					return BoxBorder {
+						[Children] = ScrollFrame {
+							ZIndex = zIndex,
+							Name = "Drop",
+							BorderSizePixel = 0,
+							Position = UDim2.new(0, 0, 1, spaceBetweenTopAndDropdown),
+							Size = Computed(function()
+								return UDim2.new(1, 0, 0, unwrap(scrollHeight))
+							end),
+							Layout = New "UIListLayout" {
+								Padding = UDim.new(0, rowPadding),	
+							},
+							UIPadding = New "UIPadding" {
+								PaddingLeft = dropdownPadding,
+								PaddingRight = dropdownPadding,
+								PaddingTop = dropdownPadding,
+								PaddingBottom = dropdownPadding,
+							},
 
-						[Children] = ForValues(dropdownItems, function(props)
-							props.ZIndex = unwrap(zIndex) + 1
-							return DropdownItem(props)
-						end),
-					})
+							[Children] = ForValues(dropdownItems, function(props)
+								props.ZIndex = unwrap(zIndex) + 1
+								return DropdownItem(props)
+							end),
+						}
+					}
 				end
 				return nil
 			end)
@@ -268,7 +272,7 @@ return function(props: DropdownProperties): Frame
 	}
 	
 	local hydrateProps = table.clone(props)
-	for _,propertyIndex in pairs(INITIAL_PROPERTIES) do
+	for _,propertyIndex in pairs(COMPONENT_ONLY_PROPERTIES) do
 		hydrateProps[propertyIndex] = nil
 	end
 	

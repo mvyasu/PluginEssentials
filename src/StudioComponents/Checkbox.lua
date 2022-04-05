@@ -23,7 +23,7 @@ local Children = Fusion.Children
 local Hydrate = Fusion.Hydrate
 
 local INDICATOR_IMAGE = "rbxassetid://6652838434"
-local INITIAL_PROPERTIES = {
+local COMPONENT_ONLY_PROPERTIES = {
 	"OnChange",
 	"Alignment",
 	"Enabled",
@@ -119,54 +119,56 @@ return function(props: CheckboxProperties): Frame
 					end
 				end,
 			},
-			BoxBorder(New "Frame" {
-				Name = "Box",
-				AnchorPoint = Computed(function()
-					return Vector2.new(unwrap(boxHorizontalScale), 0)
-				end),
-				Position = Computed(function()
-					return UDim2.fromScale(unwrap(boxHorizontalScale), 0)
-				end),
-				BackgroundColor3 = themeProvider:GetColor(Enum.StudioStyleGuideColor.CheckedFieldBackground, backModifier),
-				Size = UDim2.fromOffset(15, 15),
+			BoxBorder {
+				Color = themeProvider:GetColor(Enum.StudioStyleGuideColor.CheckedFieldBorder, mainModifier),
 				
-				[Children] = New "ImageLabel" {
-					AnchorPoint = Vector2.new(.5, .5),
-					Visible = Computed(function()
-						return unwrap(currentValue)~=false
+				[Children] = New "Frame" {
+					Name = "Box",
+					AnchorPoint = Computed(function()
+						return Vector2.new(unwrap(boxHorizontalScale), 0)
 					end),
-					Name = "Indicator",
-					BackgroundTransparency = 1,
-					Size = UDim2.fromOffset(13, 13),
-					Position = UDim2.fromScale(.5, .5),
-					Image = INDICATOR_IMAGE,
-					ImageColor3 = Computed(function()
-						local indicatorColor = unwrap(checkFieldIndicatorColor)
-						return if unwrap(isIndeterminate) then Color3.fromRGB(255, 255, 255) else indicatorColor
+					Position = Computed(function()
+						return UDim2.fromScale(unwrap(boxHorizontalScale), 0)
 					end),
-					ImageRectOffset = Computed(function()
-						local currentTheme = unwrap(themeProvider.Theme)
-						if unwrap(isIndeterminate) then
-							-- should probably check for the brightness of the background color and determine
-							-- which indeterminate color to use instead of checking for "Dark"
-							return if currentTheme=="Dark" then Vector2.new(13, 0) else Vector2.new(26, 0)
-						end
-						return Vector2.new(0, 0)
-					end),
-					ImageRectSize = Vector2.new(13, 13),
-					
-					[Children] = Computed(function()
-						local useCurvedBoxes = unwrap(constants.CurvedBoxes)
-						if useCurvedBoxes then
-							return New "UICorner" {
-								CornerRadius = constants.CornerRadius
-							}
-						end
-					end)
+					BackgroundColor3 = themeProvider:GetColor(Enum.StudioStyleGuideColor.CheckedFieldBackground, backModifier),
+					Size = UDim2.fromOffset(15, 15),
+
+					[Children] = New "ImageLabel" {
+						AnchorPoint = Vector2.new(.5, .5),
+						Visible = Computed(function()
+							return unwrap(currentValue)~=false
+						end),
+						Name = "Indicator",
+						BackgroundTransparency = 1,
+						Size = UDim2.fromOffset(13, 13),
+						Position = UDim2.fromScale(.5, .5),
+						Image = INDICATOR_IMAGE,
+						ImageColor3 = Computed(function()
+							local indicatorColor = unwrap(checkFieldIndicatorColor)
+							return if unwrap(isIndeterminate) then Color3.fromRGB(255, 255, 255) else indicatorColor
+						end),
+						ImageRectOffset = Computed(function()
+							local currentTheme = unwrap(themeProvider.Theme)
+							if unwrap(isIndeterminate) then
+								-- should probably check for the brightness of the background color and determine
+								-- which indeterminate color to use instead of checking for "Dark"
+								return if currentTheme=="Dark" then Vector2.new(13, 0) else Vector2.new(26, 0)
+							end
+							return Vector2.new(0, 0)
+						end),
+						ImageRectSize = Vector2.new(13, 13),
+
+						[Children] = Computed(function()
+							local useCurvedBoxes = unwrap(constants.CurvedBoxes)
+							if useCurvedBoxes then
+								return New "UICorner" {
+									CornerRadius = constants.CornerRadius
+								}
+							end
+						end)
+					}
 				}
-			}, {
-				Color = themeProvider:GetColor(Enum.StudioStyleGuideColor.CheckedFieldBorder, mainModifier)
-			}),
+			},
 			Computed(function()
 				if props.Text then
 					return New "TextLabel" {
@@ -193,7 +195,7 @@ return function(props: CheckboxProperties): Frame
 	}
 	
 	local hydrateProps = table.clone(props)
-	for _,propertyIndex in pairs(INITIAL_PROPERTIES) do
+	for _,propertyIndex in pairs(COMPONENT_ONLY_PROPERTIES) do
 		hydrateProps[propertyIndex] = nil
 	end
 	

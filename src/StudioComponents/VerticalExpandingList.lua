@@ -27,16 +27,20 @@ return function(props: VerticalExpandingListProperties): Frame
 	local hydrateProps = table.clone(props)
 	hydrateProps.Padding = nil
 	
-	return Hydrate(BoxBorder(Background {
-		Size = UDim2.fromScale(1, 0),
-		AutomaticSize = Enum.AutomaticSize.Y,
-		
-		[Children] = New "UIListLayout" {
-			SortOrder = Enum.SortOrder.LayoutOrder,
-			FillDirection = Enum.FillDirection.Vertical,
-			Padding = Computed(function()
-				return unwrap(props.Padding) or UDim.new(0, 10)
-			end),
+	return Hydrate(
+		BoxBorder {
+			[Children] = Background {
+				Size = UDim2.fromScale(1, 0),
+				AutomaticSize = Enum.AutomaticSize.Y,
+
+				[Children] = New "UIListLayout" {
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					FillDirection = Enum.FillDirection.Vertical,
+					Padding = Computed(function()
+						return unwrap(props.Padding) or UDim.new(0, 10)
+					end),
+				}
+			}
 		}
-	}))(hydrateProps)
+	)(hydrateProps)
 end

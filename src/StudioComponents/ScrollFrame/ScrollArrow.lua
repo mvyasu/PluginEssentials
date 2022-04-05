@@ -27,7 +27,7 @@ local ARROW_IMAGE = "rbxassetid://6677623152"
 local BAR_SIZE = scrollConstants.ScrollBarSize
 local ARROW_IMAGE_SIZE = scrollConstants.ScrollArrowImageSize
 
-local INITIAL_PROPERTIES = {
+local COMPONENT_ONLY_PROPERTIES = {
 	"Enabled",
 	"Activated",
 	"Direction",
@@ -171,7 +171,7 @@ return function(props: ScrollArrowProperties): ImageButton
 	end
 	
 	local hydrateProps = table.clone(props)
-	for _,propertyIndex in pairs(INITIAL_PROPERTIES) do
+	for _,propertyIndex in pairs(COMPONENT_ONLY_PROPERTIES) do
 		hydrateProps[propertyIndex] = nil
 	end
 

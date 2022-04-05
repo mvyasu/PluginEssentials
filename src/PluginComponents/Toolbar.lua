@@ -4,7 +4,7 @@ local Fusion = require(Plugin:FindFirstChild("Fusion", true))
 local Hyrdrate = Fusion.Hydrate
 local Children = Fusion.Children
 
-local INITIAL_PROPERTIES = {
+local COMPONENT_ONLY_PROPERTIES = {
 	"Name",
 }
 
@@ -13,12 +13,11 @@ type ToolbarProperties = {
 	[any]: any,
 }
 
-
 return function(props: ToolbarProperties): PluginToolbar
 	local newToolbar = Plugin:CreateToolbar(props.Name)
 	
 	local hydrateProps = table.clone(props)
-	for _,propertyName in pairs(INITIAL_PROPERTIES) do
+	for _,propertyName in pairs(COMPONENT_ONLY_PROPERTIES) do
 		hydrateProps[propertyName] = nil
 	end
 

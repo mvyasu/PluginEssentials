@@ -28,7 +28,7 @@ local Ref = Fusion.Ref
 local PADDING_BAR_SIDE = 3
 local PADDING_REGION_TOP = 1
 local PADDING_REGION_SIDE = 6
-local INITIAL_PROPERTIES = {
+local COMPONENT_ONLY_PROPERTIES = {
 	"ZIndex",
 	"OnChange",
 	"Value",
@@ -110,81 +110,83 @@ return function(props: SliderProperties): TextButton
 	local handleFill = themeProvider:GetColor(Enum.StudioStyleGuideColor.Button, handleModifier)
 	local handleBorder = themeProvider:GetColor(Enum.StudioStyleGuideColor.Border, handleModifier)
 	
-	local newSlider = New "TextButton" {
-		Name = "Slider",
-		Text = "",
-		Active = false,
-		AutoButtonColor = false,
-		Size = UDim2.new(1, 0, 0, 22),
-		ZIndex = zIndex,
-		BorderSizePixel = 0,
-		BackgroundColor3 = themeProvider:GetColor(Enum.StudioStyleGuideColor.InputFieldBackground, mainModifier),
-		[Cleanup] = cleanupInputValueObserver,
-		
-		[Children] = {
-			New "Frame" {
-				Name = "Bar",
-				ZIndex = zIndex,
-				Position = UDim2.fromOffset(PADDING_BAR_SIDE, 10),
-				Size = UDim2.new(1, -PADDING_BAR_SIDE * 2, 0, 2),
-				BorderSizePixel = 0,
-				BackgroundTransparency = Computed(function()
-					return if not unwrap(isEnabled) then 0.4 else 0
-				end),
-				BackgroundColor3 = themeProvider:GetColor(
-					-- this looks odd but provides the correct colors for both themes
-					Enum.StudioStyleGuideColor.TitlebarText,
-					Enum.StudioStyleGuideModifier.Disabled
-				),
-			},
-			New "Frame" {
-				Name = "HandleRegion",
-				ZIndex = 1,
-				Position = UDim2.fromOffset(PADDING_REGION_SIDE, PADDING_REGION_TOP),
-				Size = UDim2.new(1, -PADDING_REGION_SIDE * 2, 1, -PADDING_REGION_TOP * 2),
-				BackgroundTransparency = 1,
-				[Ref] = handleRegion,
-				
-				[Children] = BoxBorder(New "Frame" {
-					Name = "Handle",
-					AnchorPoint = Vector2.new(0.5, 0),
-					Position = Computed(function()
-						return UDim2.fromScale(unwrap(alpha), 0)
-					end),
-					Size = UDim2.new(0, 10, 1, 0),
-					BorderMode = Enum.BorderMode.Inset,
-					BackgroundColor3 = handleFill,
+	local newSlider = BoxBorder {
+		[Children] = New "TextButton" {
+			Name = "Slider",
+			Text = "",
+			Active = false,
+			AutoButtonColor = false,
+			Size = UDim2.new(1, 0, 0, 22),
+			ZIndex = zIndex,
+			BorderSizePixel = 0,
+			BackgroundColor3 = themeProvider:GetColor(Enum.StudioStyleGuideColor.InputFieldBackground, mainModifier),
+			[Cleanup] = cleanupInputValueObserver,
+
+			[Children] = {
+				New "Frame" {
+					Name = "Bar",
+					ZIndex = zIndex,
+					Position = UDim2.fromOffset(PADDING_BAR_SIDE, 10),
+					Size = UDim2.new(1, -PADDING_BAR_SIDE * 2, 0, 2),
 					BorderSizePixel = 0,
-					
-					[OnEvent "InputBegan"] = function(inputObject)
-						if not unwrap(isEnabled) then
-							return
-						elseif inputObject.UserInputType == Enum.UserInputType.MouseMovement then
-							isHovering:set(true)
-						end
-					end,
-					[OnEvent "InputEnded"] = function(inputObject)
-						if not unwrap(isEnabled) then
-							return
-						elseif inputObject.UserInputType == Enum.UserInputType.MouseMovement then
-							isHovering:set(false)
-						end
-					end,
-				}, {
-					Color = Computed(function()
-						return unwrap(handleBorder):Lerp(unwrap(handleFill), if not unwrap(isEnabled) then .5 else 0)
-					end)
-				})
+					BackgroundTransparency = Computed(function()
+						return if not unwrap(isEnabled) then 0.4 else 0
+					end),
+					BackgroundColor3 = themeProvider:GetColor(
+						-- this looks odd but provides the correct colors for both themes
+						Enum.StudioStyleGuideColor.TitlebarText,
+						Enum.StudioStyleGuideModifier.Disabled
+					),
+				},
+				New "Frame" {
+					Name = "HandleRegion",
+					ZIndex = 1,
+					Position = UDim2.fromOffset(PADDING_REGION_SIDE, PADDING_REGION_TOP),
+					Size = UDim2.new(1, -PADDING_REGION_SIDE * 2, 1, -PADDING_REGION_TOP * 2),
+					BackgroundTransparency = 1,
+					[Ref] = handleRegion,
+
+					[Children] = BoxBorder {
+						Color =  Computed(function()
+							return unwrap(handleBorder):Lerp(unwrap(handleFill), if not unwrap(isEnabled) then .5 else 0)
+						end),
+
+						[Children] = New "Frame" {
+							Name = "Handle",
+							AnchorPoint = Vector2.new(0.5, 0),
+							Position = Computed(function()
+								return UDim2.fromScale(unwrap(alpha), 0)
+							end),
+							Size = UDim2.new(0, 10, 1, 0),
+							BorderMode = Enum.BorderMode.Inset,
+							BackgroundColor3 = handleFill,
+							BorderSizePixel = 0,
+
+							[OnEvent "InputBegan"] = function(inputObject)
+								if not unwrap(isEnabled) then
+									return
+								elseif inputObject.UserInputType == Enum.UserInputType.MouseMovement then
+									isHovering:set(true)
+								end
+							end,
+							[OnEvent "InputEnded"] = function(inputObject)
+								if not unwrap(isEnabled) then
+									return
+								elseif inputObject.UserInputType == Enum.UserInputType.MouseMovement then
+									isHovering:set(false)
+								end
+							end,
+						}
+					}
+				}
 			}
 		}
 	}
 	
 	local hydrateProps = table.clone(props)
-	for _,propertyIndex in pairs(INITIAL_PROPERTIES) do
+	for _,propertyIndex in pairs(COMPONENT_ONLY_PROPERTIES) do
 		hydrateProps[propertyIndex] = nil
 	end
-	
-	BoxBorder(newSlider)
 	
 	return Hydrate(newSlider)(hydrateProps)
 end
