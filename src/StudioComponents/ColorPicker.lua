@@ -72,9 +72,9 @@ return function(props: ColorPickerProperties): Frame
 	local function updateCurrentInput()
 		local hue, sat, val = unwrap(inputColor, false):ToHSV()
 		currentRegionInput:set(Vector2.new(1-hue, 1-sat))
-		currentSliderInput:set(Vector2.new(0, 1-val))
+		currentSliderInput:set(if unwrap(isHorizontalList, false) then Vector2.new(0, 1-val) else Vector2.new(val, 0))
 	end
-	
+
 	updateCurrentInput()
 	
 	local currentColor = Computed(function()
@@ -83,27 +83,33 @@ return function(props: ColorPickerProperties): Frame
 		return Color3.fromHSV(
 			math.max(0.0001, 1 - regionInput.X),
 			math.max(0.0001, 1 - regionInput.Y),
-			math.max(0.0001, 1 - if unwrap( isHorizontalList, false) then sliderInput.Y else 1-sliderInput.X)
+			math.max(0.0001, 1 - if unwrap(isHorizontalList, false) then sliderInput.Y else 1-sliderInput.X)
 		)
 	end)
 	
 	local function roundNumber(number: number)
-		return if math.abs(1-number)<.01 or number<.01 then math.round(number) else number
+		return if (1-number)<.01 or number<.01 then math.round(number) else number
 	end
 	
+	local lastUpdatedColor = nil
 	local cleanupInputColorObserver = Observer(inputColor):onChange(updateCurrentInput)
 	local cleanupCurrentColorObserver = Observer(currentColor):onChange(function()
 		local newColor = unwrap(currentColor, false)
 		if props.OnChange then
-			-- to prevent dependency issues
-			task.spawn(function()
-				-- due to the math.max earlier, I need to round to the nearest whole number just in case
-				props.OnChange(Color3.new(
-					roundNumber(newColor.R),
-					roundNumber(newColor.G),
-					roundNumber(newColor.B)
-				))
-			end)
+			local roundedColor = Color3.new(
+				roundNumber(newColor.R),
+				roundNumber(newColor.G),
+				roundNumber(newColor.B)
+			)
+			
+			if lastUpdatedColor~=roundedColor then
+				lastUpdatedColor = roundedColor
+				-- to prevent dependency issues
+				task.spawn(function()
+					-- due to the math.max earlier, I need to round to the nearest whole number just in case
+					props.OnChange(roundedColor)
+				end)
+			end
 		end
 	end)
 	
