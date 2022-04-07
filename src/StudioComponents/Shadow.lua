@@ -13,6 +13,7 @@ local StudioComponentsUtil = StudioComponents:FindFirstChild("Util")
 
 local themeProvider = require(StudioComponentsUtil.themeProvider)
 local constants = require(StudioComponentsUtil.constants)
+local unwrap = require(StudioComponentsUtil.unwrap)
 
 local New = Fusion.New
 local Computed = Fusion.Computed
@@ -66,7 +67,7 @@ return function(props: ShadowProperties): Frame
 		LayoutOrder = props.LayoutOrder or 10000,
 		Image = Side.image,
 		ImageTransparency = Computed(function()
-			if themeProvider.IsDark:get() then
+			if unwrap(themeProvider.IsDark)then
 				-- Softer shadows on light themes
 				return ((props.transparency or 0) * 0.55) + 0.45
 			else
