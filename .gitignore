@@ -1,0 +1,6 @@
+# Project build file
+/*.rbxm
+/*.rbxmx
+
+# VS Code files
+.vscode/*

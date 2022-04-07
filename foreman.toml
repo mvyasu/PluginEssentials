@@ -1,0 +1,5 @@
+[tools]
+selene = { source = "Kampfkarren/selene", version = "0.16.0" }
+stylua = { source = "JohnnyMorganz/stylua", version = "0.13.0" }
+rojo = { source = "roblox/rojo", version = "7.0.0" }
+run-in-roblox = { source = "rojo-rbx/run-in-roblox", version = "0.3.0" }
