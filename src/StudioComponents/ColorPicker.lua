@@ -14,6 +14,7 @@ local themeProvider = require(StudioComponentsUtil.themeProvider)
 local getDragInput = require(StudioComponentsUtil.getDragInput)
 local unwrap = require(StudioComponentsUtil.unwrap)
 local types = require(StudioComponentsUtil.types)
+local stripProps = require(StudioComponentsUtil.stripProps)
 
 local New = Fusion.New
 local Value = Fusion.Value
@@ -45,14 +46,14 @@ type ColorPickerProperties = {
 
 return function(props: ColorPickerProperties): Frame
 	local listDisplayMode = getState(props.ListDisplayMode, Enum.ListDisplayMode.Horizontal)
-	
+
 	local isEnabled = getState(props.Enabled, true)
 	local isHovering = Value(false)
-	
+
 	local isHorizontalList = Computed(function()
 		return unwrap(listDisplayMode)==Enum.ListDisplayMode.Horizontal
 	end)
-	
+
 	local regionRef = Value()
 	local sliderRef = Value()
 
@@ -61,13 +62,13 @@ return function(props: ColorPickerProperties): Frame
 		Instance = regionRef,
 		Value = Value(Vector2.new()),
 	})
-	
+
 	local currentSliderInput = getDragInput({
 		Enabled = isEnabled,
 		Instance = sliderRef,
 		Value = Value(Vector2.new()),
 	})
-	
+
 	local inputColor = getState(props.Value, Color3.new(1, 1, 1))
 	local function updateCurrentInput()
 		local hue, sat, val = unwrap(inputColor, false):ToHSV()
@@ -76,7 +77,7 @@ return function(props: ColorPickerProperties): Frame
 	end
 
 	updateCurrentInput()
-	
+
 	local currentColor = Computed(function()
 		local regionInput = unwrap(currentRegionInput)
 		local sliderInput = unwrap(currentSliderInput)
@@ -86,11 +87,11 @@ return function(props: ColorPickerProperties): Frame
 			math.max(0.0001, 1 - if unwrap(isHorizontalList, false) then sliderInput.Y else 1-sliderInput.X)
 		)
 	end)
-	
+
 	local function roundNumber(number: number)
 		return if (1-number)<.01 or number<.01 then math.round(number) else number
 	end
-	
+
 	local lastUpdatedColor = nil
 	local cleanupInputColorObserver = Observer(inputColor):onChange(updateCurrentInput)
 	local cleanupCurrentColorObserver = Observer(currentColor):onChange(function()
@@ -101,7 +102,7 @@ return function(props: ColorPickerProperties): Frame
 				roundNumber(newColor.G),
 				roundNumber(newColor.B)
 			)
-			
+
 			if lastUpdatedColor~=roundedColor then
 				lastUpdatedColor = roundedColor
 				-- to prevent dependency issues
@@ -112,7 +113,7 @@ return function(props: ColorPickerProperties): Frame
 			end
 		end
 	end)
-	
+
 	local modifier = Computed(function()
 		local isDisabled = not unwrap(isEnabled)
 		if isDisabled then
@@ -120,11 +121,11 @@ return function(props: ColorPickerProperties): Frame
 		end
 		return Enum.StudioStyleGuideModifier.Default
 	end)
-	
+
 	local zIndex = Computed(function()
 		return (unwrap(props.ZIndex) or 0) + 1
 	end)
-	
+
 	local newColorPicker = New "Frame" {
 		Name = "ColorPicker",
 		Size = UDim2.new(1, 0, 0, 150),
@@ -133,7 +134,7 @@ return function(props: ColorPickerProperties): Frame
 			cleanupInputColorObserver()
 			cleanupCurrentColorObserver()
 		end,
-		
+
 		[Children] = {
 			BoxBorder {
 				[Children] = New "TextButton" {
@@ -238,7 +239,7 @@ return function(props: ColorPickerProperties): Frame
 
 						[Children] = {
 							New "Frame" {
-								Name = "Vertical",	
+								Name = "Vertical",
 								Position = UDim2.fromOffset(8, 0),
 								Size = UDim2.new(0, 2, 1, 0),
 								BorderSizePixel = 0,
@@ -257,11 +258,7 @@ return function(props: ColorPickerProperties): Frame
 			},
 		}
 	}
-	
-	local hydrateProps = table.clone(props)
-	for _,propertyIndex in pairs(COMPONENT_ONLY_PROPERTIES) do
-		hydrateProps[propertyIndex] = nil
-	end
-	
+
+	local hydrateProps = stripProps(props, COMPONENT_ONLY_PROPERTIES)
 	return Hydrate(newColorPicker)(hydrateProps)
 end

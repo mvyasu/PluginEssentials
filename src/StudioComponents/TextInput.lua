@@ -14,6 +14,7 @@ local themeProvider = require(StudioComponentsUtil.themeProvider)
 local constants = require(StudioComponentsUtil.constants)
 local unwrap = require(StudioComponentsUtil.unwrap)
 local types = require(StudioComponentsUtil.types)
+local stripProps = require(StudioComponentsUtil.stripProps)
 
 local Computed = Fusion.Computed
 local OnChange = Fusion.OnChange
@@ -25,6 +26,11 @@ local New = Fusion.New
 
 local PLACEHOLDER_TEXT_COLOR = Color3.fromRGB(102, 102, 102)
 
+local COMPONENT_ONLY_PROPERTIES = {
+	"Enabled",
+	"ClearTextOnFocus"
+}
+
 export type TextInputProperties = {
 	Enabled: (boolean | types.StateObject<boolean>)?,
 	[any]: any,
@@ -34,14 +40,14 @@ return function(props: TextInputProperties): TextLabel
 	local isEnabled = getState(props.Enabled, true)
 	local isHovering = Value(false)
 	local isFocused = Value(false)
-	
+
 	local mainModifier = Computed(function()
 		if not unwrap(isEnabled) then
 			return Enum.StudioStyleGuideModifier.Disabled
 		end
 		return Enum.StudioStyleGuideModifier.Default
 	end)
-	
+
 	local borderModifier = Computed(function()
 		local isDisabled = not unwrap(isEnabled)
 		local isHovering = unwrap(isHovering)
@@ -55,13 +61,13 @@ return function(props: TextInputProperties): TextLabel
 		end
 		return Enum.StudioStyleGuideModifier.Default
 	end)
-	
+
 	local currentTextBounds = Value(Vector2.new())
 	local absoluteTextBoxSize = Value(Vector2.new())
-	
+
 	local newTextBox = BoxBorder {
 		Color = themeProvider:GetColor(Enum.StudioStyleGuideColor.InputFieldBorder, borderModifier),
-		
+
 		[Children] = New "TextBox" {
 			Name = "TextInput",
 			Size = UDim2.new(1, 0, 0, 25),
@@ -117,11 +123,7 @@ return function(props: TextInputProperties): TextLabel
 			},
 		}
 	}
-	
-	local hydrateProps = table.clone(props)
-	for _,propertyIndex in pairs({"Enabled", "ClearTextOnFocus"}) do
-		hydrateProps[propertyIndex] = nil
-	end
-	
+
+	local hydrateProps = stripProps(props, COMPONENT_ONLY_PROPERTIES)
 	return Hydrate(newTextBox)(hydrateProps)
 end

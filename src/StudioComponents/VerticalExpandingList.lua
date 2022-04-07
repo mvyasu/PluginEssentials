@@ -12,11 +12,16 @@ local BoxBorder = require(StudioComponents.BoxBorder)
 
 local unwrap = require(StudioComponentsUtil.unwrap)
 local types = require(StudioComponentsUtil.types)
+local stripProps = require(StudioComponentsUtil.stripProps)
 
 local Children = Fusion.Children
 local Computed = Fusion.Computed
 local Hydrate = Fusion.Hydrate
 local New = Fusion.New
+
+local COMPONENT_ONLY_PROPERTIES = {
+	"Padding",
+}
 
 type VerticalExpandingListProperties = {
 	Padding: (UDim | types.StateObject<UDim>)?,
@@ -24,9 +29,8 @@ type VerticalExpandingListProperties = {
 }
 
 return function(props: VerticalExpandingListProperties): Frame
-	local hydrateProps = table.clone(props)
-	hydrateProps.Padding = nil
-	
+	local hydrateProps = stripProps(props, COMPONENT_ONLY_PROPERTIES)
+
 	return Hydrate(
 		BoxBorder {
 			[Children] = Background {
