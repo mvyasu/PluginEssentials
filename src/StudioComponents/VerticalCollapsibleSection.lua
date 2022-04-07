@@ -52,7 +52,7 @@ return function(props: VerticalExpandingListProperties): Frame
 		elseif isHovering then
 			return Enum.StudioStyleGuideModifier.Hover
 		end
-		return themeProvider.IsDark:get() and Enum.StudioStyleGuideModifier.Default or Enum.StudioStyleGuideModifier.Pressed
+		return if unwrap(themeProvider.IsDark) then Enum.StudioStyleGuideModifier.Default else Enum.StudioStyleGuideModifier.Pressed
 	end)
 
 	local isCollapsed = Computed(function()
