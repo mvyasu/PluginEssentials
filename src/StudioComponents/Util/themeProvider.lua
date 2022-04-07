@@ -22,7 +22,8 @@ local themeProvider = {
 		Bold = Enum.Font.SourceSansBold,
 		Black = Enum.Font.GothamBlack,
 		Mono = Enum.Font.Code,
-	}
+	},
+	IsDark = Value(true),
 }
 
 function themeProvider:GetColor(studioStyleGuideColor: styleStyleGuideColor, studioStyleGuideModifier: styleGuideModifier?): computedOrValue
@@ -84,11 +85,15 @@ local function updateTheme()
 		end
 	end
 	themeProvider.Theme:set(Studio.Theme.Name)
+
+	local _,_,v = Studio.Theme:GetColor(Enum.StudioStyleGuideColor.MainBackground):ToHSV()
+	themeProvider.IsDark:set(v<=0.6)
 end
+updateTheme()
 
 do
 	local themeChangedConnection = Studio.ThemeChanged:Connect(updateTheme)
-	
+
 	Plugin.Unloading:Connect(function()
 		themeChangedConnection:Disconnect()
 		themeChangedConnection = nil
