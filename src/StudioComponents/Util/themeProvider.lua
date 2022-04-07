@@ -32,7 +32,7 @@ function themeProvider:GetColor(studioStyleGuideColor: styleStyleGuideColor, stu
 	local function isCorrectType(value, enumType)
 		local unwrapped = unwrap(value, false)
 		local isState = unwrapped ~= value and unwrapped~=nil
-		assert((value==nil or isState) or (typeof(value)=="EnumItem" and value.EnumType==enumType))
+		assert((value==nil or isState) or (typeof(value)=="EnumItem" and value.EnumType==enumType), "Incorrect type")
 	end
 
 	isCorrectType(studioStyleGuideColor, Enum.StudioStyleGuideColor)
@@ -89,10 +89,10 @@ local function updateTheme()
 	local _,_,v = Studio.Theme:GetColor(Enum.StudioStyleGuideColor.MainBackground):ToHSV()
 	themeProvider.IsDark:set(v<=0.6)
 end
-updateTheme()
 
 do
 	local themeChangedConnection = Studio.ThemeChanged:Connect(updateTheme)
+	updateTheme()
 
 	Plugin.Unloading:Connect(function()
 		themeChangedConnection:Disconnect()
