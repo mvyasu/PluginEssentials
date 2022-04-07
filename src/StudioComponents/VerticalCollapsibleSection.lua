@@ -16,6 +16,7 @@ local themeProvider = require(StudioComponentsUtil.themeProvider)
 local constants = require(StudioComponentsUtil.constants)
 local unwrap = require(StudioComponentsUtil.unwrap)
 local types = require(StudioComponentsUtil.types)
+local stripProps = require(StudioComponentsUtil.stripProps)
 
 local Children = Fusion.Children
 local Computed = Fusion.Computed
@@ -25,6 +26,14 @@ local Value = Fusion.Value
 local New = Fusion.New
 
 local HEADER_HEIGHT = 25
+
+local COMPONENT_ONLY_PROPERTIES = {
+	"Padding",
+	"Collapsed",
+	"Text",
+	"Enabled",
+	Children,
+}
 
 type VerticalExpandingListProperties = {
 	Enabled: (boolean | types.StateObject<boolean>)?,
@@ -36,12 +45,7 @@ return function(props: VerticalExpandingListProperties): Frame
 	local shouldBeCollapsed = getState(props.Collapsed, false, "Value")
 	local isEnabled = getState(props.Enabled, true)
 
-	local hydrateProps = table.clone(props)
-	hydrateProps.Padding = nil
-	hydrateProps.Collapsed = nil
-	hydrateProps.Text = nil
-	hydrateProps.Enabled = nil
-	hydrateProps[Children] = nil
+	local hydrateProps = stripProps(props, COMPONENT_ONLY_PROPERTIES)
 
 	local isHovering = Value(false)
 	local modifier = Computed(function()

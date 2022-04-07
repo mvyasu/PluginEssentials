@@ -14,6 +14,7 @@ local themeProvider = require(StudioComponentsUtil.themeProvider)
 local getDragInput = require(StudioComponentsUtil.getDragInput)
 local unwrap = require(StudioComponentsUtil.unwrap)
 local types = require(StudioComponentsUtil.types)
+local stripProps = require(StudioComponentsUtil.stripProps)
 
 local Computed = Fusion.Computed
 local Children = Fusion.Children
@@ -53,7 +54,7 @@ type SliderProperties = {
 return function(props: SliderProperties): TextButton
 	local isEnabled = getState(props.Enabled, true)
 	local isHovering = Value(false)
-	
+
 	local mainModifier = Computed(function()
 		local isDisabled = not unwrap(isEnabled)
 		if isDisabled then
@@ -61,7 +62,7 @@ return function(props: SliderProperties): TextButton
 		end
 		return Enum.StudioStyleGuideModifier.Default
 	end)
-	
+
 	local handleModifier = Computed(function()
 		local isDisabled =  not unwrap(isEnabled)
 		local isHovering = unwrap(isHovering)
@@ -72,7 +73,7 @@ return function(props: SliderProperties): TextButton
 		end
 		return Enum.StudioStyleGuideModifier.Default
 	end)
-	
+
 	local handleRegion = Value()
 	local inputValue = getState(props.Value, 1)
 	local draggerValue = getDragInput({
@@ -94,22 +95,22 @@ return function(props: SliderProperties): TextButton
 			end
 		end,
 	})
-	
+
 	local cleanupInputValueObserver = Observer(inputValue):onChange(function()
 		draggerValue:set(Vector2.new(unwrap(inputValue, false), 0))
 	end)
-	
+
 	local alpha = Computed(function()
 		return unwrap(draggerValue).X
 	end)
-	
+
 	local zIndex = Computed(function()
 		return (unwrap(props.ZIndex) or 0) + 1
 	end)
-	
+
 	local handleFill = themeProvider:GetColor(Enum.StudioStyleGuideColor.Button, handleModifier)
 	local handleBorder = themeProvider:GetColor(Enum.StudioStyleGuideColor.Border, handleModifier)
-	
+
 	local newSlider = BoxBorder {
 		[Children] = New "TextButton" {
 			Name = "Slider",
@@ -182,11 +183,7 @@ return function(props: SliderProperties): TextButton
 			}
 		}
 	}
-	
-	local hydrateProps = table.clone(props)
-	for _,propertyIndex in pairs(COMPONENT_ONLY_PROPERTIES) do
-		hydrateProps[propertyIndex] = nil
-	end
-	
+
+	local hydrateProps = stripProps(props, COMPONENT_ONLY_PROPERTIES)
 	return Hydrate(newSlider)(hydrateProps)
 end
