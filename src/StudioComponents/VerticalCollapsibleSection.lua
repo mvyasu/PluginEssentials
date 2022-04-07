@@ -35,14 +35,14 @@ type VerticalExpandingListProperties = {
 return function(props: VerticalExpandingListProperties): Frame
 	local shouldBeCollapsed = getState(props.Collapsed, false, "Value")
 	local isEnabled = getState(props.Enabled, true)
-	
+
 	local hydrateProps = table.clone(props)
 	hydrateProps.Padding = nil
 	hydrateProps.Collapsed = nil
 	hydrateProps.Text = nil
 	hydrateProps.Enabled = nil
 	hydrateProps[Children] = nil
-	
+
 	local isHovering = Value(false)
 	local modifier = Computed(function()
 		local isHovering = unwrap(isHovering)
@@ -52,30 +52,30 @@ return function(props: VerticalExpandingListProperties): Frame
 		elseif isHovering then
 			return Enum.StudioStyleGuideModifier.Hover
 		end
-		return Enum.StudioStyleGuideModifier.Default
+		return if unwrap(themeProvider.IsDark) then Enum.StudioStyleGuideModifier.Default else Enum.StudioStyleGuideModifier.Pressed
 	end)
-	
+
 	local isCollapsed = Computed(function()
 		local shouldBeCollapsed = unwrap(shouldBeCollapsed)
 		local isEnabled = unwrap(isEnabled)
 		return if isEnabled then shouldBeCollapsed else true
 	end)
-	
+
 	local labelColor = themeProvider:GetColor(Enum.StudioStyleGuideColor.BrightText, modifier)
 	local backgroundColor = themeProvider:GetColor(Enum.StudioStyleGuideColor.MainBackground)
 	local themeColorModifier = Computed(function()
 		local _, _, v = unwrap(backgroundColor):ToHSV()
 		return if v<.5 then -1 else 1
 	end)
-	
+
 	return Hydrate(VerticalExpandingList {
 		Name = "VerticalCollapsibleSection",
 		BackgroundTransparency = 1,
-		
+
 		[Children] = {
 			BoxBorder {
 				Color = themeProvider:GetColor(Enum.StudioStyleGuideColor.Border),
-				
+
 				[Children] = New "Frame" {
 					Name = "CollapsibleSectionHeader",
 					LayoutOrder = 0,
@@ -143,7 +143,7 @@ return function(props: VerticalExpandingListProperties): Frame
 						}
 					}
 				}
-			},			
+			},
 			Computed(function()
 				if not unwrap(isCollapsed) then
 					return props[Children]

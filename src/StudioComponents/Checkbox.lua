@@ -40,15 +40,15 @@ type CheckboxProperties = {
 	[any]: any,
 }
 
-return function(props: CheckboxProperties): Frame	
+return function(props: CheckboxProperties): Frame
 	local currentValue = getState(props.Value, true)
 	local isEnabled = getState(props.Enabled, true)
 	local isHovering = Value(false)
-	
+
 	local isIndeterminate = Computed(function()
 		return unwrap(currentValue)==nil
 	end)
-	
+
 	local mainModifier = Computed(function()
 		local isDisabled = not unwrap(isEnabled)
 		local isHovering = unwrap(isHovering)
@@ -59,7 +59,7 @@ return function(props: CheckboxProperties): Frame
 		end
 		return Enum.StudioStyleGuideModifier.Default
 	end)
-	
+
 	local backModifier = Computed(function()
 		local isDisabled = not unwrap(isEnabled)
 		local isChecked = unwrap(currentValue)
@@ -70,23 +70,23 @@ return function(props: CheckboxProperties): Frame
 		end
 		return Enum.StudioStyleGuideModifier.Default
 	end)
-	
+
 	local checkFieldIndicatorColor = themeProvider:GetColor(Enum.StudioStyleGuideColor.CheckedFieldIndicator, mainModifier)
-	
+
 	local boxHorizontalScale = Computed(function()
 		local currentAlignment = unwrap(props.Alignment) or Enum.HorizontalAlignment.Left
 		return if currentAlignment==Enum.HorizontalAlignment.Right then 1 else 0
 	end)
-	
+
 	local textHorizontalScale = Computed(function()
 		return if unwrap(boxHorizontalScale)==1 then 0 else 1
 	end)
-	
+
 	local newCheckboxFrame = New "Frame" {
 		Name = "Checkbox",
 		Size = UDim2.new(1, 0, 0, 15),
 		BackgroundTransparency = 1,
-		
+
 		[Children] = {
 			New "TextButton" {
 				Text = "",
@@ -94,7 +94,7 @@ return function(props: CheckboxProperties): Frame
 				Name = "CheckBoxInput",
 				Size = UDim2.fromScale(1, 1),
 				BackgroundTransparency = 1,
-				
+
 				[OnEvent "InputBegan"] = function(inputObject)
 					if not unwrap(isEnabled) then
 						return
@@ -121,7 +121,7 @@ return function(props: CheckboxProperties): Frame
 			},
 			BoxBorder {
 				Color = themeProvider:GetColor(Enum.StudioStyleGuideColor.CheckedFieldBorder, mainModifier),
-				
+
 				[Children] = New "Frame" {
 					Name = "Box",
 					AnchorPoint = Computed(function()
@@ -148,11 +148,8 @@ return function(props: CheckboxProperties): Frame
 							return if unwrap(isIndeterminate) then Color3.fromRGB(255, 255, 255) else indicatorColor
 						end),
 						ImageRectOffset = Computed(function()
-							local currentTheme = unwrap(themeProvider.Theme)
 							if unwrap(isIndeterminate) then
-								-- should probably check for the brightness of the background color and determine
-								-- which indeterminate color to use instead of checking for "Dark"
-								return if currentTheme=="Dark" then Vector2.new(13, 0) else Vector2.new(26, 0)
+								return if unwrap(themeProvider.IsDark) then Vector2.new(13, 0) else Vector2.new(26, 0)
 							end
 							return Vector2.new(0, 0)
 						end),
@@ -193,11 +190,11 @@ return function(props: CheckboxProperties): Frame
 			end)
 		}
 	}
-	
+
 	local hydrateProps = table.clone(props)
 	for _,propertyIndex in pairs(COMPONENT_ONLY_PROPERTIES) do
 		hydrateProps[propertyIndex] = nil
 	end
-	
+
 	return Hydrate(newCheckboxFrame)(hydrateProps)
 end
