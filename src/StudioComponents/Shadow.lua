@@ -2,6 +2,7 @@
 
 type ShadowProperties = {
     Side: string,
+	Transparency: number?,
 	[any]: any,
 }
 
@@ -67,11 +68,11 @@ return function(props: ShadowProperties): Frame
 		LayoutOrder = props.LayoutOrder or 10000,
 		Image = Side.image,
 		ImageTransparency = Computed(function()
-			if unwrap(themeProvider.IsDark)then
+			if not unwrap(themeProvider.IsDark)then
 				-- Softer shadows on light themes
-				return ((props.transparency or 0) * 0.55) + 0.45
+				return ((props.Transparency or 0) * 0.55) + 0.45
 			else
-				return props.transparency or 0
+				return props.Transparency or 0
 			end
 		end),
 
