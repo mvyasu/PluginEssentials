@@ -14,6 +14,7 @@ local themeProvider = require(StudioComponentsUtil.themeProvider)
 local constants = require(StudioComponentsUtil.constants)
 local unwrap = require(StudioComponentsUtil.unwrap)
 local types = require(StudioComponentsUtil.types)
+local stripProps = require(StudioComponentsUtil.stripProps)
 
 local New = Fusion.New
 local Value = Fusion.Value
@@ -45,7 +46,7 @@ return function(props: BaseButtonProperties): TextButton
 	local isEnabled = getState(props.Enabled, true)
 	local isHovering = Value(false)
 	local isPressed = Value(false)
-	
+
 	local modifier = Computed(function()
 		local isSelected = unwrap(props.Selected)
 		local isDisabled = not unwrap(isEnabled)
@@ -62,10 +63,10 @@ return function(props: BaseButtonProperties): TextButton
 		end
 		return Enum.StudioStyleGuideModifier.Default
 	end)
-	
+
 	local newBaseButton = BoxBorder {
 		Color = themeProvider:GetColor(props.BorderColorStyle or Enum.StudioStyleGuideColor.CheckedFieldBorder, modifier),
-		
+
 		[Children] = New "TextButton" {
 			Name = "BaseButton",
 			Size = UDim2.fromScale(1, 1),
@@ -107,11 +108,7 @@ return function(props: BaseButtonProperties): TextButton
 			end)(),
 		}
 	}
-	
-	local hydrateProps = table.clone(props)
-	for _,propertyIndex in pairs(COMPONENT_ONLY_PROPERTIES) do
-		hydrateProps[propertyIndex] = nil
-	end
-	
+
+	local hydrateProps = stripProps(props, COMPONENT_ONLY_PROPERTIES)
 	return Hydrate(newBaseButton)(hydrateProps)
 end

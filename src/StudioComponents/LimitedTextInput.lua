@@ -31,7 +31,7 @@ return function(props: LimitedTextInputProperties)
 	createProps.GraphemeLimit = nil
 	createProps.TextLimit = nil
 	createProps.OnChange = nil
-	
+
 	local function limitText(newText: string)
 		local desiredGraphemeLimit = unwrap(props.GraphemeLimit)
 		local desiredTextLimit = unwrap(props.TextLimit)
@@ -43,9 +43,9 @@ return function(props: LimitedTextInputProperties)
 		if (hasDesiredTextLimit or hasDesiredGraphemeLimit) then
 			local textWithTextLimit = newText:sub(1, if hasDesiredTextLimit then desiredTextLimit else #newText)
 
-			if hasDesiredGraphemeLimit then					
+			if hasDesiredGraphemeLimit then
 				local graphemesToLength = {}
-				for first, last in utf8.graphemes(textWithTextLimit) do 
+				for first, last in utf8.graphemes(textWithTextLimit) do
 					table.insert(graphemesToLength, last)
 				end
 
@@ -59,16 +59,16 @@ return function(props: LimitedTextInputProperties)
 		end
 		return newCurrentText
 	end
-	
+
 	local textBoxRef = TextInput(createProps)
 	local lastUpdateText = textBoxRef.Text
-	
+
 	local function updateWithLimitedText(newText: string)
 		local newCurrentText = limitText(newText or textBoxRef.Text)
-		
+
 		textBoxRef.Text = newCurrentText
 		currentText:set(newCurrentText)
-		
+
 		if lastUpdateText~=unwrap(currentText) then
 			lastUpdateText = newCurrentText
 			if props.OnChange then
@@ -76,9 +76,9 @@ return function(props: LimitedTextInputProperties)
 			end
 		end
 	end
-	
+
 	updateWithLimitedText(textBoxRef.Text)
-	
+
 	return Hydrate (textBoxRef) {
 		[OnChange "Text"] = updateWithLimitedText,
 	}

@@ -10820,6 +10820,8 @@ required = false
 type = "number"
 [[table.clear.args]]
 type = "table"
+[[table.clone.args]]
+type = "table"
 [[table.create.args]]
 type = "number"
 

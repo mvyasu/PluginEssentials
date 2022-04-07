@@ -12,6 +12,7 @@ local themeProvider = require(StudioComponentsUtil.themeProvider)
 local constants = require(StudioComponentsUtil.constants)
 local unwrap = require(StudioComponentsUtil.unwrap)
 local types = require(StudioComponentsUtil.types)
+local stripProps = require(StudioComponentsUtil.stripProps)
 
 
 local Computed = Fusion.Computed
@@ -34,7 +35,7 @@ type LabelProperties = {
 return function(props: LabelProperties): TextLabel
 	local isEnabled = getState(props.Enabled, true)
 	local textSize = props.TextSize or constants.TextSize
-	
+
 	local newLabel = New "TextLabel" {
 		Name = "Label",
 		Position = UDim2.fromScale(0, 0),
@@ -55,11 +56,7 @@ return function(props: LabelProperties): TextLabel
 		BorderSizePixel = 0,
 		BorderMode = Enum.BorderMode.Inset,
 	}
-	
-	local hydrateProps = table.clone(props)
-	for _,propertyIndex in pairs(COMPONENT_ONLY_PROPERTIES) do
-		hydrateProps[propertyIndex] = nil
-	end
-	
+
+	local hydrateProps = stripProps(props, COMPONENT_ONLY_PROPERTIES)
 	return Hydrate(newLabel)(hydrateProps)
 end

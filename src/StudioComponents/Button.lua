@@ -19,13 +19,7 @@ return function(props: ButtonProperties): TextButton
 	if not props.Name then
 		props.Name = "Button"
 	end
-	
+
 	local newButton = BaseButton(props)
-	return Hydrate(newButton) {
-		--[Children] = {
-		--	New "UICorner" {
-		--		CornerRadius = UDim.new(0, 4)
-		--	}
-		--}
-	}
+	return newButton
 end
