@@ -35,6 +35,7 @@ This is a Fusion port of [StudioComponents](https://github.com/sircfenner/Studio
 | [ScrollFrame](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/ScrollFrame/init.lua) | A custom scrolling frame that doesn't use Roblox's ScrollingFrame. | Frame |
 | [Slider](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/Slider.lua) | A slider that reacts to being dragged. | TextButton |
 | [ProgressBar](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/ProgressBar.lua) | A bar that fills up with an accent color. | TextBox |
+| [TextInput](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/TextInput.lua) | A TextBox that reacts to states like hover, focus, and disabled. | TextBox |
 | [LimitedTextInput](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/LimitedTextInput.lua) | TextInput, but contains properties for limiting the length of input to the TextBox. | TextBox |
 | [VerticalExpandingList](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/VerticalExpandingList.lua) | A Frame that uses AutomaticSize for the Y axis and contains a UIListLayout. | Frame |
 | [VerticalCollapsibleSection](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/VerticalCollapsibleSection.lua) | A frame that contains a header and a content frame. The content frame can be collapsed by clicking on the header.  | Frame |
