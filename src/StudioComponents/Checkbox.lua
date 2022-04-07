@@ -149,7 +149,7 @@ return function(props: CheckboxProperties): Frame
 						end),
 						ImageRectOffset = Computed(function()
 							if unwrap(isIndeterminate) then
-								return themeProvider.IsDark:get() and Vector2.new(13, 0) or Vector2.new(26, 0)
+								return unwrap(themeProvider.IsDark) and Vector2.new(13, 0) or Vector2.new(26, 0)
 							end
 							return Vector2.new(0, 0)
 						end),
