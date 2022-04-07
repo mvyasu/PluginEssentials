@@ -1,8 +1,7 @@
 local Plugin = script:FindFirstAncestorWhichIsA("Plugin")
 local Fusion = require(Plugin:FindFirstChild("Fusion", true))
 
-local Hyrdrate = Fusion.Hydrate
-local OnEvent = Fusion.OnEvent
+local Hydrate = Fusion.Hydrate
 
 local COMPONENT_ONLY_PROPERTIES = {
 	"ToolTip",
@@ -26,11 +25,11 @@ return function(props: ToolbarProperties)
 		props.ToolTip,
 		props.Image
 	)
-	
+
 	local hydrateProps = table.clone(props)
 	for _,propertyName in pairs(COMPONENT_ONLY_PROPERTIES) do
 		hydrateProps[propertyName] = nil
 	end
 
-	return Hyrdrate(toolbarButton)(hydrateProps)
+	return Hydrate(toolbarButton)(hydrateProps)
 end
