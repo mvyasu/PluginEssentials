@@ -79,7 +79,7 @@ return function(props: VerticalExpandingListProperties): Frame
 		Name = "VerticalCollapsibleSection",
 		BackgroundTransparency = 1,
 		--TODO: remove this +2 once BorderMode becomes a thing for UIStroke
-		Size = UDim2.new(1,0,0,HEADER_HEIGHT+2),
+		Size = UDim2.new(1, 0, 0, HEADER_HEIGHT+2),
 		AutomaticSize = Computed(function()
 			return isCollapsed:get() and Enum.AutomaticSize.None or Enum.AutomaticSize.Y
 		end),

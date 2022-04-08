@@ -77,7 +77,7 @@ return function(props: SliderProperties): TextButton
 
 	local handleRegion = Value()
 	local inputValue = getState(props.Value, 1)
-	local draggerValue = getDragInput({
+	local currentValue, currentAlpha = getDragInput({
 		Instance = handleRegion,
 		Enabled = isEnabled,
 		Value = Value(Vector2.new(unwrap(inputValue), 0)),
@@ -90,19 +90,15 @@ return function(props: SliderProperties): TextButton
 		Step = Computed(function()
 			return Vector2.new(unwrap(props.Step) or -1, 0)
 		end),
-		OnChange = function(newAlpha: Vector2)
+		OnChange = function(newValue: Vector2)
 			if props.OnChange then
-				props.OnChange(newAlpha.X)
+				props.OnChange(newValue.X)
 			end
 		end,
 	})
 
 	local cleanupInputValueObserver = Observer(inputValue):onChange(function()
-		draggerValue:set(Vector2.new(unwrap(inputValue, false), 0))
-	end)
-
-	local alpha = Computed(function()
-		return unwrap(draggerValue).X
+		currentValue:set(Vector2.new(unwrap(inputValue, false), 0))
 	end)
 
 	local zIndex = Computed(function()
@@ -157,7 +153,7 @@ return function(props: SliderProperties): TextButton
 							Name = "Handle",
 							AnchorPoint = Vector2.new(0.5, 0),
 							Position = Spring(Computed(function()
-								return UDim2.fromScale(unwrap(alpha), 0)
+								return UDim2.fromScale(unwrap(currentAlpha).X, 0)
 							end), 40),
 							Size = UDim2.new(0, 10, 1, 0),
 							BorderMode = Enum.BorderMode.Inset,
