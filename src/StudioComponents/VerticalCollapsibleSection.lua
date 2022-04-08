@@ -24,6 +24,7 @@ local OnEvent = Fusion.OnEvent
 local Hydrate = Fusion.Hydrate
 local Value = Fusion.Value
 local New = Fusion.New
+local Spring = Fusion.Spring
 
 local HEADER_HEIGHT = 25
 
@@ -31,6 +32,7 @@ local COMPONENT_ONLY_PROPERTIES = {
 	"Padding",
 	"Collapsed",
 	"Text",
+	"TextColor3",
 	"Enabled",
 	Children,
 }
@@ -38,6 +40,7 @@ local COMPONENT_ONLY_PROPERTIES = {
 type VerticalExpandingListProperties = {
 	Enabled: (boolean | types.StateObject<boolean>)?,
 	Collapsed: (boolean | types.Value<boolean>)?,
+	Padding: (UDim | types.StateObject<UDim>)?,
 	[any]: any,
 }
 
@@ -75,17 +78,22 @@ return function(props: VerticalExpandingListProperties): Frame
 	return Hydrate(VerticalExpandingList {
 		Name = "VerticalCollapsibleSection",
 		BackgroundTransparency = 1,
+		Size = UDim2.new(1,0,0,HEADER_HEIGHT),
+		AutomaticSize = Computed(function()
+			return isCollapsed:get() and Enum.AutomaticSize.None or Enum.AutomaticSize.Y
+		end),
+		Padding = props.Padding,
 
 		[Children] = {
 			BoxBorder {
-				Color = themeProvider:GetColor(Enum.StudioStyleGuideColor.Border),
+				Color = Spring(themeProvider:GetColor(Enum.StudioStyleGuideColor.Border), 40),
 
 				[Children] = New "Frame" {
 					Name = "CollapsibleSectionHeader",
 					LayoutOrder = 0,
 					Active = true,
 					Size = UDim2.new(1, 0, 0, HEADER_HEIGHT),
-					BackgroundColor3 = themeProvider:GetColor(Enum.StudioStyleGuideColor.HeaderSection, modifier),
+					BackgroundColor3 = Spring(themeProvider:GetColor(Enum.StudioStyleGuideColor.HeaderSection, modifier), 40),
 
 					[OnEvent "InputBegan"] = function(inputObject)
 						if not unwrap(isEnabled) then
@@ -111,7 +119,7 @@ return function(props: VerticalExpandingListProperties): Frame
 							Position = UDim2.new(0, 7, 0.5, 0),
 							Size = UDim2.fromOffset(10, 10),
 							Image = "rbxassetid://5607705156",
-							ImageColor3 = Computed(function()
+							ImageColor3 = Spring(Computed(function()
 								local baseColor = Color3.fromRGB(170, 170, 170)
 								local themeModifier = unwrap(themeColorModifier)
 								if unwrap(isEnabled) then
@@ -119,7 +127,7 @@ return function(props: VerticalExpandingListProperties): Frame
 								end
 								local h, s, v = baseColor:ToHSV()
 								return Color3.fromHSV(h, s, math.clamp(v - .2, 0, 1))
-							end),
+							end), 40),
 							ImageRectOffset = Computed(function()
 								return Vector2.new(unwrap(isCollapsed) and 0 or 10, 0)
 							end),
@@ -127,15 +135,15 @@ return function(props: VerticalExpandingListProperties): Frame
 							BackgroundTransparency = 1,
 						},
 						Label {
-							TextColor3 = Computed(function()
-								local currentLabelColor = unwrap(labelColor)
+							TextColor3 = Spring(Computed(function()
+								local currentLabelColor = unwrap(props.TextColor3 or labelColor)
 								local themeModifier = unwrap(themeColorModifier)
 								if unwrap(isEnabled) then
 									return currentLabelColor
 								end
 								local h, s, v = currentLabelColor:ToHSV()
 								return Color3.fromHSV(h, s, math.clamp(v + .3 * themeModifier, 0, 1))
-							end),
+							end), 40),
 							TextXAlignment = Enum.TextXAlignment.Left,
 							Font = themeProvider:GetFont("Bold"),
 							TextSize = constants.TextSize,
@@ -148,11 +156,7 @@ return function(props: VerticalExpandingListProperties): Frame
 					}
 				}
 			},
-			Computed(function()
-				if not unwrap(isCollapsed) then
-					return props[Children]
-				end
-			end)
+			props[Children],
 		}
 	})(hydrateProps)
 end
