@@ -41,7 +41,8 @@ local Hydrate = Fusion.Hydrate
 local Observer = Fusion.Observer
 local Cleanup = Fusion.Cleanup
 
-type vector2Input = (Vector2 | types.Value<Vector2>)?
+type vector2Value = types.Value<Vector2>
+type vector2Input = (Vector2 | vector2Value)?
 
 type DragInputProperites = {
 	Instance: GuiObject,
@@ -53,13 +54,13 @@ type DragInputProperites = {
 	Step: vector2Input,
 }
 
-return function(props: DragInputProperites): types.Value<Vector2>
+return function(props: DragInputProperites): (vector2Value, types.Computed<Vector2>)
 	local isEnabled = getState(props.Enabled, true)
 	local isDragging = Value(false)
-	
+
 	local connectionProvider = props.Instance
 	local globalConnection = nil
-	
+
 	local currentValue = getState(props.Value, Vector2.new(0, 0), "Value")
 	local maxValue = getState(props.Max, Vector2.new(1, 1))
 	local minValue = getState(props.Min, Vector2.new(0, 0))
@@ -67,7 +68,11 @@ return function(props: DragInputProperites): types.Value<Vector2>
 	local range = Computed(function()
 		return unwrap(maxValue) - unwrap(minValue)
 	end)
-	
+
+	local currentAlpha = Computed(function()
+		return (unwrap(currentValue) - unwrap(minValue)) / unwrap(range)
+	end)
+
 	local function processInput(position)
 		local connectionProvider = unwrap(connectionProvider, false)
 		if connectionProvider then
@@ -87,7 +92,7 @@ return function(props: DragInputProperites): types.Value<Vector2>
 				math.clamp(value.X, 0, range.X) + unwrap(minValue, false).X,
 				math.clamp(value.Y, 0, range.Y) + unwrap(minValue, false).Y
 			)
-			
+
 			if value ~= unwrap(currentValue) then
 				if props.OnChange then
 					local newValue = props.OnChange(value)
@@ -98,17 +103,17 @@ return function(props: DragInputProperites): types.Value<Vector2>
 			end
 		end
 	end
-	
+
 	local function onDragStart(inputObject)
 		local connectionProvider = unwrap(connectionProvider)
 		local currentlyDragging = unwrap(isDragging)
 		if not unwrap(isEnabled) or currentlyDragging or inputObject.UserInputType ~= Enum.UserInputType.MouseButton1 or connectionProvider==nil or globalConnection then
 			return
 		end
-		
+
 		isDragging:set(true)
 		processInput(Vector2.new(inputObject.Position.X, inputObject.Position.Y))
-		
+
 		local widget = connectionProvider:FindFirstAncestorWhichIsA("DockWidgetPluginGui")
 		if widget ~= nil then
 			globalConnection = game:GetService("RunService").Heartbeat:Connect(function()
@@ -122,14 +127,14 @@ return function(props: DragInputProperites): types.Value<Vector2>
 			end)
 		end
 	end
-	
+
 	local function cleanupGlobalConnection()
 		if globalConnection then
 			globalConnection:Disconnect()
 			globalConnection = nil
 		end
 	end
-	
+
 	local tasks = {}
 	local function cleanupTasks()
 		for _,cleanupTask in pairs(tasks) do
@@ -143,7 +148,7 @@ return function(props: DragInputProperites): types.Value<Vector2>
 			cleanupTasks()
 		else
 			table.insert(tasks, cleanupGlobalConnection)
-			
+
 			Hydrate(connectionProvider)({
 				[Cleanup] = cleanupTasks,
 				[OnEvent "InputBegan"] = onDragStart,
@@ -161,6 +166,6 @@ return function(props: DragInputProperites): types.Value<Vector2>
 			})
 		end
 	end))
-	
-	return currentValue
+
+	return currentValue, currentAlpha
 end

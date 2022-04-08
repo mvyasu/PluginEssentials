@@ -13,10 +13,10 @@ local Label = require(StudioComponents.Label)
 
 local getState = require(StudioComponentsUtil.getState)
 local themeProvider = require(StudioComponentsUtil.themeProvider)
+local stripProps = require(StudioComponentsUtil.stripProps)
 local constants = require(StudioComponentsUtil.constants)
 local unwrap = require(StudioComponentsUtil.unwrap)
 local types = require(StudioComponentsUtil.types)
-local stripProps = require(StudioComponentsUtil.stripProps)
 
 local Children = Fusion.Children
 local Computed = Fusion.Computed
@@ -78,13 +78,30 @@ return function(props: VerticalExpandingListProperties): Frame
 	return Hydrate(VerticalExpandingList {
 		Name = "VerticalCollapsibleSection",
 		BackgroundTransparency = 1,
-		Size = UDim2.new(1,0,0,HEADER_HEIGHT),
+		--TODO: remove this +2 once BorderMode becomes a thing for UIStroke
+		Size = UDim2.new(1, 0, 0, HEADER_HEIGHT+2),
 		AutomaticSize = Computed(function()
 			return isCollapsed:get() and Enum.AutomaticSize.None or Enum.AutomaticSize.Y
 		end),
 		Padding = props.Padding,
 
 		[Children] = {
+			--TODO: remove this UIPadding and Frame once BorderMode becomes a thing for UIStroke
+			-- until then, this will need to stay here
+			New "UIPadding" {
+				Name = "BorderUIPadding",
+				PaddingRight = UDim.new(0, 1),
+				PaddingLeft = UDim.new(0, 1),
+				PaddingTop = UDim.new(0, 1),
+				PaddingBottom = UDim.new(0, 1),
+			},
+			New "Frame" {
+				Name = "BorderBottomPadding",
+				LayoutOrder = 10^5,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 0, 0),
+			},
+			
 			BoxBorder {
 				Color = Spring(themeProvider:GetColor(Enum.StudioStyleGuideColor.Border), 40),
 

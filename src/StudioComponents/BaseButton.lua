@@ -100,8 +100,6 @@ return function(props: BaseButtonProperties): TextButton
 				if props.Activated then
 					return function()
 						if unwrap(isEnabled, false) then
-							isHovering:set(false)
-							isPressed:set(false)
 							props.Activated()
 						end
 					end
