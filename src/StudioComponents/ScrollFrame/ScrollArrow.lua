@@ -9,7 +9,6 @@ local StudioComponentsUtil = StudioComponents:FindFirstChild("Util")
 
 local getState = require(StudioComponentsUtil.getState)
 local themeProvider = require(StudioComponentsUtil.themeProvider)
-local constants = require(StudioComponentsUtil.constants)
 local unwrap = require(StudioComponentsUtil.unwrap)
 local types = require(StudioComponentsUtil.types)
 
@@ -41,14 +40,12 @@ type ScrollArrowProperties = {
 	[any]: any,
 }
 
-local function getBaseProperties(mainModifier: types.Computed<Enum.StudioStyleGuideModifier>, props: ScrollArrowProperties)	
+local function getBaseProperties(mainModifier: types.Computed<Enum.StudioStyleGuideModifier>, props: ScrollArrowProperties)
 	return {
 		AnchorPoint = Computed(function()
 			local currentDirection = unwrap(props.Direction)
 			if currentDirection=="Down" then
 				return Vector2.new(0, 1)
-			elseif currentDirection=="Left" then
-				return Vector2.new(BAR_SIZE, 0)
 			elseif currentDirection=="Right" then
 				return Vector2.new(1, 0)
 			end
@@ -98,9 +95,9 @@ return function(props: ScrollArrowProperties): ImageButton
 		end
 		return Enum.StudioStyleGuideModifier.Default
 	end)
-	
+
 	local listenConnection = nil
-	
+
 	local function disconnect()
 		if listenConnection then
 			listenConnection:Disconnect()
@@ -123,11 +120,11 @@ return function(props: ScrollArrowProperties): ImageButton
 			end)
 		end
 	end
-	
+
 	local zIndex = Computed(function()
 		return unwrap(props.ZIndex) or 2
 	end)
-	
+
 	local newScrollArrow = New "ImageButton" {
 		AutoButtonColor = false,
 		ZIndex = zIndex,
@@ -138,7 +135,7 @@ return function(props: ScrollArrowProperties): ImageButton
 			end
 			return isEnabled
 		end),
-		[OnEvent "InputBegan"] = function(inputObject)			
+		[OnEvent "InputBegan"] = function(inputObject)
 			if not unwrap(isEnabled) then
 				return
 			elseif inputObject.UserInputType == Enum.UserInputType.MouseMovement then
@@ -163,13 +160,13 @@ return function(props: ScrollArrowProperties): ImageButton
 		end,
 		[Cleanup] = disconnect,
 	}
-	
+
 	for index, value in pairs(getBaseProperties(modifier, props)) do
 		if props[index]==nil then
 			props[index] = value
 		end
 	end
-	
+
 	local hydrateProps = table.clone(props)
 	for _,propertyIndex in pairs(COMPONENT_ONLY_PROPERTIES) do
 		hydrateProps[propertyIndex] = nil
