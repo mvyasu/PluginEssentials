@@ -32,10 +32,9 @@ local COMPONENT_ONLY_PROPERTIES = {
 }
 
 type ScrollFrameProperties = {
-	Enabled: (boolean | types.StateObject<boolean>)?,
 	ScrollingEnabled: (boolean | types.StateObject<boolean>)?,
-	VerticalScrollBarPosition: (EnumItem | types.StateObject<EnumItem>)?,
-	VerticalScrollBarInset: (EnumItem | types.StateObject<EnumItem>)?,
+	VerticalScrollBarPosition: (Enum.VerticalScrollBarPosition | types.StateObject<Enum.VerticalScrollBarPosition>)?,
+	VerticalScrollBarInset: (Enum.ScrollBarInset | types.StateObject<Enum.ScrollBarInset>)?,
 	[any]: any,
 }
 
