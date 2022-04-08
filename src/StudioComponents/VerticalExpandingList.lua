@@ -44,9 +44,9 @@ return function(props: VerticalExpandingListProperties): Frame
 				Size = Spring(Computed(function()
 					local mode = unwrap(props.AutomaticSize or Enum.AutomaticSize.Y) -- Custom autosize since engine sizing is unreliable
 					if mode == Enum.AutomaticSize.Y then
-						local s = contentSize:get()
+						local s = unwrap(contentSize)
 						if s then
-							return UDim2.new(1,0,0,contentSize:get().Y)
+							return UDim2.new(1,0,0,s.Y)
 						else
 							return UDim2.new(1,0,0,0)
 						end
