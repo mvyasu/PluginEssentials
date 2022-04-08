@@ -22,7 +22,7 @@
 	- heartbeat is a frame late
 	- changed will fire on same frame at least while mouse is over the area
 	- so we only get frame-late input when mouse is outside the area
-	
+
 --]]
 
 local Plugin = script:FindFirstAncestorWhichIsA("Plugin")
@@ -167,5 +167,5 @@ return function(props: DragInputProperites): (vector2Value, types.Computed<Vecto
 		end
 	end))
 
-	return currentValue, currentAlpha
+	return currentValue, currentAlpha, isDragging
 end
