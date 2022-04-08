@@ -61,6 +61,9 @@ return function(props: LoadingProperties): Frame
         end
     end
 
+    local light = themeProvider:GetColor(Enum.StudioStyleGuideColor.Light, Enum.StudioStyleGuideModifier.Default)
+	local accent = themeProvider:GetColor(Enum.StudioStyleGuideColor.DialogMainButton, Enum.StudioStyleGuideModifier.Default)
+
 	local alphaA = Computed(function()
 		local t = (unwrap(time) + 0.25) * pi4
 		return (cos(t)+1)/2
@@ -71,18 +74,10 @@ return function(props: LoadingProperties): Frame
 	end)
 
 	local colorA = Spring(Computed(function()
-		local alpha = unwrap(alphaA)
-		local light = themeProvider:GetColor(Enum.StudioStyleGuideColor.Light, Enum.StudioStyleGuideModifier.Default):get()
-		local accent = themeProvider:GetColor(Enum.StudioStyleGuideColor.DialogMainButton, Enum.StudioStyleGuideModifier.Default):get()
-
-		return light:Lerp(accent, alpha)
+		return unwrap(light):Lerp(unwrap(accent), unwrap(alphaA))
 	end), 40)
 	local colorB = Spring(Computed(function()
-		local alpha = unwrap(alphaB)
-		local light = themeProvider:GetColor(Enum.StudioStyleGuideColor.Light, Enum.StudioStyleGuideModifier.Default):get()
-		local accent = themeProvider:GetColor(Enum.StudioStyleGuideColor.DialogMainButton, Enum.StudioStyleGuideModifier.Default):get()
-
-		return light:Lerp(accent, alpha)
+		return unwrap(light):Lerp(unwrap(accent), unwrap(alphaB))
 	end), 40)
 
 	local sizeA = Spring(Computed(function()
