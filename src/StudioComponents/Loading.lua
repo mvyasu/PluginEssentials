@@ -37,19 +37,20 @@ local clock = os.clock
 local pi4 = 12.566370614359172 --4*pi
 
 return function(props: LoadingProperties): Frame
+    local isEnabled = getState(props.Enabled, true)
 	local time = Value(0)
 
 	local function startMotion()
 		local startTime = clock()
-		while unwrap(props.Enabled) do
+		while unwrap(isEnabled) do
 			time:set(clock()-startTime)
 			task.wait(1/25) -- Springs will smooth out the motion so we needn't bother with high refresh rate here
 		end
 	end
 
     local animThread = task.defer(startMotion)
-	Observer(props.Enabled):onChange(function()
-		if unwrap(props.Enabled) then
+	Observer(isEnabled):onChange(function()
+		if unwrap(isEnabled) then
 			animThread = task.defer(startMotion)
 		end
 	end)
@@ -99,7 +100,7 @@ return function(props: LoadingProperties): Frame
 		Name = "Loading",
 		BackgroundTransparency = 1,
 		Size = UDim2.new(0,constants.TextSize*4, 0,constants.TextSize*1.5),
-		Visible = props.Enabled,
+		Visible = isEnabled,
 		ClipsDescendants = true,
         [Cleanup] = haltAnim,
 
