@@ -25,6 +25,7 @@ local Cleanup = Fusion.Cleanup
 local Value = Fusion.Value
 local New = Fusion.New
 local Ref = Fusion.Ref
+local Spring = Fusion.Spring
 
 local PADDING_BAR_SIDE = 3
 local PADDING_REGION_TOP = 1
@@ -76,7 +77,7 @@ return function(props: SliderProperties): TextButton
 
 	local handleRegion = Value()
 	local inputValue = getState(props.Value, 1)
-	local draggerValue = getDragInput({
+	local currentValue, currentAlpha = getDragInput({
 		Instance = handleRegion,
 		Enabled = isEnabled,
 		Value = Value(Vector2.new(unwrap(inputValue), 0)),
@@ -89,19 +90,15 @@ return function(props: SliderProperties): TextButton
 		Step = Computed(function()
 			return Vector2.new(unwrap(props.Step) or -1, 0)
 		end),
-		OnChange = function(newAlpha: Vector2)
+		OnChange = function(newValue: Vector2)
 			if props.OnChange then
-				props.OnChange(newAlpha.X)
+				props.OnChange(newValue.X)
 			end
 		end,
 	})
 
 	local cleanupInputValueObserver = Observer(inputValue):onChange(function()
-		draggerValue:set(Vector2.new(unwrap(inputValue, false), 0))
-	end)
-
-	local alpha = Computed(function()
-		return unwrap(draggerValue).X
+		currentValue:set(Vector2.new(unwrap(inputValue, false), 0))
 	end)
 
 	local zIndex = Computed(function()
@@ -120,7 +117,7 @@ return function(props: SliderProperties): TextButton
 			Size = UDim2.new(1, 0, 0, 22),
 			ZIndex = zIndex,
 			BorderSizePixel = 0,
-			BackgroundColor3 = themeProvider:GetColor(Enum.StudioStyleGuideColor.InputFieldBackground, mainModifier),
+			BackgroundColor3 = Spring(themeProvider:GetColor(Enum.StudioStyleGuideColor.InputFieldBackground, mainModifier), 40),
 			[Cleanup] = cleanupInputValueObserver,
 
 			[Children] = {
@@ -130,9 +127,9 @@ return function(props: SliderProperties): TextButton
 					Position = UDim2.fromOffset(PADDING_BAR_SIDE, 10),
 					Size = UDim2.new(1, -PADDING_BAR_SIDE * 2, 0, 2),
 					BorderSizePixel = 0,
-					BackgroundTransparency = Computed(function()
+					BackgroundTransparency = Spring(Computed(function()
 						return if not unwrap(isEnabled) then 0.4 else 0
-					end),
+					end), 40),
 					BackgroundColor3 = themeProvider:GetColor(
 						-- this looks odd but provides the correct colors for both themes
 						Enum.StudioStyleGuideColor.TitlebarText,
@@ -148,16 +145,16 @@ return function(props: SliderProperties): TextButton
 					[Ref] = handleRegion,
 
 					[Children] = BoxBorder {
-						Color =  Computed(function()
+						Color =  Spring(Computed(function()
 							return unwrap(handleBorder):Lerp(unwrap(handleFill), if not unwrap(isEnabled) then .5 else 0)
-						end),
+						end), 40),
 
 						[Children] = New "Frame" {
 							Name = "Handle",
 							AnchorPoint = Vector2.new(0.5, 0),
-							Position = Computed(function()
-								return UDim2.fromScale(unwrap(alpha), 0)
-							end),
+							Position = Spring(Computed(function()
+								return UDim2.fromScale(unwrap(currentAlpha).X, 0)
+							end), 40),
 							Size = UDim2.new(0, 10, 1, 0),
 							BorderMode = Enum.BorderMode.Inset,
 							BackgroundColor3 = handleFill,

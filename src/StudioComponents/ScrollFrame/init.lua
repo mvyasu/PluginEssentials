@@ -24,6 +24,7 @@ local Hydrate = Fusion.Hydrate
 local OnEvent = Fusion.OnEvent
 local Value = Fusion.Value
 local New = Fusion.New
+local Spring = Fusion.Spring
 
 local BAR_SIZE = scrollConstants.ScrollBarSize
 local SCROLL_STEP = scrollConstants.ScrollStep
@@ -66,7 +67,7 @@ type ScrollFrameProperties = {
 
 return function(props: ScrollFrameProperties): Frame
 	-- properties --
-	
+
 	local function joinDictionaries(d1, d2)
 		for index,value in pairs(d1) do
 			if d2[index]==nil then
@@ -75,20 +76,20 @@ return function(props: ScrollFrameProperties): Frame
 		end
 		return d2
 	end
-	
+
 	props = joinDictionaries(baseProperties, props)
-	
+
 	local isEnabled = getState(props.Enabled, true)
-	
+
 	local modifier = Computed(function()
 		if not unwrap(isEnabled) then
 			return Enum.StudioStyleGuideModifier.Disabled
 		end
 		return Enum.StudioStyleGuideModifier.Default
 	end)
-	
+
 	-- input
-	
+
 	local listContentSize = Value(Vector2.new())
 	local paddingAdjustment = Value({
 		PaddingBottom = UDim.new(),
@@ -96,7 +97,7 @@ return function(props: ScrollFrameProperties): Frame
 		PaddingRight = UDim.new(),
 		PaddingTop = UDim.new(),
 	})
-	
+
 	local contentSize = Computed(function()
 		local listContentSize = unwrap(listContentSize)
 		local paddingAdjustment = unwrap(paddingAdjustment)
@@ -105,26 +106,26 @@ return function(props: ScrollFrameProperties): Frame
 			listContentSize.Y + paddingAdjustment.PaddingTop.Offset + paddingAdjustment.PaddingBottom.Offset
 		)
 	end)
-	
+
 	local windowSize = Value(Vector2.new())
 	local canvasPosition = Value(Vector2.new())
-	
+
 	local function setCanvasPosition(newPosition)
 		if props.OnScrolled then
 			props.OnScrolled(newPosition)
 		end
 		canvasPosition:set(newPosition)
 	end
-	
+
 	local scrollingDirection = getState(props.ScrollingDirection, Enum.ScrollingDirection.Y)
 	local innerWindowSize = Computed(function()
 		local direction =  unwrap(scrollingDirection)
 		local hasX = direction ~= Enum.ScrollingDirection.Y
 		local hasY = direction ~= Enum.ScrollingDirection.X
-		
+
 		local windowSize = unwrap(windowSize)
 		local windowSizeWithBars = windowSize - Vector2.new(BAR_SIZE + 1, BAR_SIZE + 1)
-		
+
 		local contentSize = unwrap(contentSize)
 		local barVisible = {
 			x = hasX and contentSize.x > windowSizeWithBars.x,
@@ -135,7 +136,7 @@ return function(props: ScrollFrameProperties): Frame
 		local sizeY = windowSize.y - (barVisible.x and BAR_SIZE + 1 or 0) -- as above
 		return maxVector(Vector2.new(sizeX, sizeY), Vector2.new(0, 0))
 	end)
-	
+
 	local barPosScale = Computed(function()
 		local windowSize = unwrap(innerWindowSize)
 		local region = unwrap(contentSize) - unwrap(windowSize)
@@ -145,7 +146,7 @@ return function(props: ScrollFrameProperties): Frame
 			region.y > 0 and canvasPosition.y / region.y or 0
 		)
 	end)
-	
+
 	local barSizeScale = Computed(function()
 		local contentSize = unwrap(contentSize)
 		local windowSize = unwrap(innerWindowSize)
@@ -155,7 +156,7 @@ return function(props: ScrollFrameProperties): Frame
 			region.y > 0 and windowSize.y / contentSize.y or 0
 		)
 	end)
-	
+
 	local barVisible = Computed(function()
 		local size = unwrap(barSizeScale)
 		local direction = unwrap(scrollingDirection)
@@ -166,27 +167,27 @@ return function(props: ScrollFrameProperties): Frame
 			y = hasY and size.y > 0 and size.y < 1,
 		}
 	end)
-	
+
 	local function refreshCanvasPosition()
 		local contentSize = unwrap(contentSize)
 		local windowSize = unwrap(innerWindowSize)
 		local max = maxVector(contentSize - windowSize, Vector2.new(0, 0))
-		
+
 		local current = unwrap(canvasPosition)
 		local target = clampVector(current, Vector2.new(0, 0), max)
 		setCanvasPosition(target)
 	end
-	
+
 	local function scroll(dir)
 		local contentSize = unwrap(contentSize, false)
 		local windowSize = unwrap(innerWindowSize, false)
 		local max = maxVector(contentSize - windowSize, Vector2.new(0, 0))
-		
+
 		local current = unwrap(canvasPosition, false)
 		local amount = dir * SCROLL_STEP
 		setCanvasPosition(clampVector(current + amount, Vector2.new(0, 0), max))
 	end
-	
+
 	local function maybeScrollInput(inputObject)
 		if not unwrap(isEnabled, false) then
 			return
@@ -200,17 +201,17 @@ return function(props: ScrollFrameProperties): Frame
 			end
 		end
 	end
-	
+
 	local dragBegin = nil
-	
+
 	local function onDragBegan()
 		dragBegin = unwrap(canvasPosition, false)
 	end
-	
+
 	local function onDragEnded()
 		dragBegin = nil
 	end
-	
+
 	local function onDragChanged(amount)
 		local windowSize = unwrap(innerWindowSize, false)
 		local contentSize = unwrap(contentSize, false)
@@ -220,11 +221,11 @@ return function(props: ScrollFrameProperties): Frame
 		local pos = dragBegin + alpha * contentSize
 		setCanvasPosition(clampVector(pos, Vector2.new(0, 0), region))
 	end
-	
+
 	local zIndex = Computed(function()
 		return unwrap(props.ZIndex) or 1
 	end)
-	
+
 	local newScrollFrame = New "Frame" {
 		ZIndex = Computed(function()
 			return unwrap(zIndex) - 1
@@ -234,7 +235,7 @@ return function(props: ScrollFrameProperties): Frame
 		BorderMode = Enum.BorderMode.Inset,
 		BackgroundColor3 = themeProvider:GetColor(Enum.StudioStyleGuideColor.MainBackground, modifier),
 		BorderColor3 = themeProvider:GetColor(Enum.StudioStyleGuideColor.Border, modifier),
-		
+
 		[OnChange "AbsoluteSize"] = function(newAbsoluteSize)
 			local border = props.BorderSizePixel * Vector2.new(2, 2) -- each border
 			windowSize:set(newAbsoluteSize - border)
@@ -242,7 +243,7 @@ return function(props: ScrollFrameProperties): Frame
 		end,
 		[OnEvent "InputBegan"] = maybeScrollInput,
 		[OnEvent "InputChanged"] = maybeScrollInput,
-		
+
 		[Children] = {
 			New "Frame" {
 				Name = "Cover",
@@ -277,16 +278,16 @@ return function(props: ScrollFrameProperties): Frame
 				end),
 				BackgroundTransparency = 1,
 				ClipsDescendants = true,
-				
+
 				[Children] = New "Frame" {
 					Name = "Holder",
 					BackgroundTransparency = 1,
 					Size = UDim2.fromScale(1, 1),
-					Position = Computed(function()
+					Position = Spring(Computed(function()
 						local pos = unwrap(canvasPosition)
 						return UDim2.fromOffset(-pos.x, -pos.y)
-					end),
-					
+					end), 40),
+
 					[Children] = {
 						Computed(function()
 							local layoutInstance = props.Layout or New "UIListLayout" (defaultLayout)
@@ -308,7 +309,7 @@ return function(props: ScrollFrameProperties): Frame
 										PaddingTop = uiPadding.PaddingTop
 									})
 								end
-								
+
 								return Hydrate(props.UIPadding)({
 									[OnEvent "Changed"] = updatePaddingAdjust,
 								})
@@ -335,7 +336,7 @@ return function(props: ScrollFrameProperties): Frame
 					local visible = unwrap(barVisible)
 					return visible.y
 				end),
-				
+
 				[Children] = {
 					ScrollArrow {
 						ZIndex = zIndex,
@@ -361,7 +362,7 @@ return function(props: ScrollFrameProperties): Frame
 						Position = UDim2.fromOffset(0, BAR_SIZE + 1),
 						Size = UDim2.new(1, 0, 1, -BAR_SIZE * 2 - 2),
 						BackgroundTransparency = 1,
-						
+
 						[Children] = ScrollBarHandle {
 							ZIndex = zIndex,
 							Enabled = isEnabled,
@@ -377,7 +378,7 @@ return function(props: ScrollFrameProperties): Frame
 								local scale = unwrap(barSizeScale)
 								return UDim2.fromScale(1, scale.y)
 							end),
-							
+
 							DragBegan = onDragBegan,
 							DragEnded = onDragEnded,
 							DragChanged = function(amount)
@@ -404,7 +405,7 @@ return function(props: ScrollFrameProperties): Frame
 					local visible = unwrap(barVisible)
 					return visible.x
 				end),
-				
+
 				[Children] = {
 					ScrollArrow {
 						ZIndex = zIndex,
@@ -429,7 +430,7 @@ return function(props: ScrollFrameProperties): Frame
 						Position = UDim2.fromOffset(BAR_SIZE + 1, 0),
 						Size = UDim2.new(1, -BAR_SIZE * 2 - 2, 1, 0),
 						BackgroundTransparency = 1,
-						
+
 						[Children] = ScrollBarHandle {
 							Enabled = isEnabled,
 							Position = Computed(function()
@@ -444,7 +445,7 @@ return function(props: ScrollFrameProperties): Frame
 								local scale = unwrap(barSizeScale)
 								return UDim2.fromScale(scale.x, 1)
 							end),
-							
+
 							DragBegan = onDragBegan,
 							DragEnded = onDragEnded,
 							DragChanged = function(amount)
@@ -456,11 +457,11 @@ return function(props: ScrollFrameProperties): Frame
 			},
 		}
 	}
-	
+
 	local hydrateProps = table.clone(props)
 	for _,propertyIndex in pairs(COMPONENT_ONLY_PROPERTIES) do
 		hydrateProps[propertyIndex] = nil
 	end
-	
+
 	return Hydrate(newScrollFrame)(hydrateProps)
 end

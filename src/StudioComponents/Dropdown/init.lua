@@ -25,6 +25,7 @@ local Children = Fusion.Children
 local OnChange = Fusion.OnChange
 local OnEvent = Fusion.OnEvent
 local Hydrate = Fusion.Hydrate
+local Spring = Fusion.Spring
 local Value = Fusion.Value
 local New = Fusion.New
 
@@ -208,7 +209,8 @@ return function(props: DropdownProperties): Frame
 				[Children] = New "TextLabel" {
 					Name = "Selected",
 					Size = UDim2.fromScale(1, 1),
-					BackgroundColor3 = themeProvider:GetColor(backgroundStyleGuideColor, modifier),
+					
+					BackgroundColor3 = Spring(themeProvider:GetColor(backgroundStyleGuideColor, modifier), 40),
 					Text = selectedItem,
 					Font = themeProvider:GetFont("Default"),
 					TextSize = constants.TextSize,

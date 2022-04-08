@@ -19,6 +19,7 @@ local Computed = Fusion.Computed
 local Hydrate = Fusion.Hydrate
 local Value = Fusion.Value
 local New = Fusion.New
+local Spring = Fusion.Spring
 
 local COMPONENT_ONLY_PROPERTIES = {
 	"Enabled",
@@ -45,12 +46,12 @@ return function(props: LabelProperties): TextLabel
 		end),
 		Text = "Label",
 		Font = themeProvider:GetFont("Default"),
-		TextColor3 = props.TextColor3 or themeProvider:GetColor(props.TextColorStyle or Enum.StudioStyleGuideColor.MainText, Computed(function()
+		TextColor3 = props.TextColor3 or Spring(themeProvider:GetColor(props.TextColorStyle or Enum.StudioStyleGuideColor.MainText, Computed(function()
 			if not unwrap(isEnabled) then
 				return Enum.StudioStyleGuideModifier.Disabled
 			end
 			return Enum.StudioStyleGuideModifier.Default
-		end)),
+		end)), 40),
 		TextSize = textSize,
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,

@@ -22,6 +22,7 @@ local Children = Fusion.Children
 local Computed = Fusion.Computed
 local OnEvent = Fusion.OnEvent
 local Hydrate = Fusion.Hydrate
+local Spring = Fusion.Spring
 
 local COMPONENT_ONLY_PROPERTIES = {
 	"TextColorStyle",
@@ -65,7 +66,7 @@ return function(props: BaseButtonProperties): TextButton
 	end)
 
 	local newBaseButton = BoxBorder {
-		Color = themeProvider:GetColor(props.BorderColorStyle or Enum.StudioStyleGuideColor.CheckedFieldBorder, modifier),
+		Color = Spring(themeProvider:GetColor(props.BorderColorStyle or Enum.StudioStyleGuideColor.CheckedFieldBorder, modifier), 40),
 
 		[Children] = New "TextButton" {
 			Name = "BaseButton",
@@ -73,8 +74,8 @@ return function(props: BaseButtonProperties): TextButton
 			Text = "Button",
 			Font = themeProvider:GetFont("Default"),
 			TextSize = constants.TextSize,
-			TextColor3 = themeProvider:GetColor(props.TextColorStyle or Enum.StudioStyleGuideColor.ButtonText, modifier),
-			BackgroundColor3 = themeProvider:GetColor(props.BackgroundColorStyle or Enum.StudioStyleGuideColor.Button, modifier),
+			TextColor3 = Spring(themeProvider:GetColor(props.TextColorStyle or Enum.StudioStyleGuideColor.ButtonText, modifier), 40),
+			BackgroundColor3 = Spring(themeProvider:GetColor(props.BackgroundColorStyle or Enum.StudioStyleGuideColor.Button, modifier), 40),
 			AutoButtonColor = false,
 
 			[OnEvent "InputBegan"] = function(inputObject)
@@ -99,8 +100,6 @@ return function(props: BaseButtonProperties): TextButton
 				if props.Activated then
 					return function()
 						if unwrap(isEnabled, false) then
-							isHovering:set(false)
-							isPressed:set(false)
 							props.Activated()
 						end
 					end
