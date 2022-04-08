@@ -24,11 +24,14 @@ This is a Fusion port of [StudioComponents](https://github.com/sircfenner/Studio
 | Component | Description | Returns |
 | --- | --- | --- |
 | [Background](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/Background.lua) | A borderless Frame with a background color that matches the user's current theme. | Frame |
+| [Label](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/Label.lua) | A simple text label following Studio style guidelines for body text. | TextLabel |
+| [Title](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/Title.lua) | A simple text label following Studio style guidelines for title text. | TextLabel |
 | [BaseButton](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/BaseButton.lua) | A TextButton that reacts to different states like hover, press, and disabled. | TextButton |
 | [Button](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/Button.lua) | BaseButton, but with a different name. | TextButton |
 | [MainButton](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/MainButton.lua) | BaseButton, but uses the style of a main button, which is usually a blue background color. | TextButton |
 | [IconButton](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/IconButton.lua) | A button with an image on it instead of text. | TextButton |
 | [Checkbox](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/Checkbox.lua) | A checkbox that reacts to different states like hover, checked, indeterminate, and disabled. | Frame |
+| [ClassIcon](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/ClassIcon.lua) | An image of a given ClassName from the user's installed Studio icon set. | ImageLabel |
 | [Shadow](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/Shadow.lua) | A subtle shadow positioned on the side of your choosing | ImageLabel |
 | [Dropdown](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/Dropdown/init.lua) | A button that shows the selected item and a list of items in a dropdown when clicking on it. | Frame |
 | [ColorPicker](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/ColorPicker.lua) | An HSV color picker that uses a value slider. | Frame |
