@@ -76,7 +76,7 @@ return function(props: ScrollFrameProperties): Frame
 	end
 
 	local containerFrame = New "Frame" {
-		Name = "NativeScrollFrame",
+		Name = "ScrollFrame",
 		BackgroundTransparency = 1,
 
 		[Children] = {
@@ -108,6 +108,7 @@ return function(props: ScrollFrameProperties): Frame
 
 				[Children] = {
 					ScrollArrow {
+						Name = "UpArrow",
 						Direction = "Up",
 						Activated = function()
 							local p = unwrap(canvasPosition) or Vector2.zero
@@ -118,6 +119,7 @@ return function(props: ScrollFrameProperties): Frame
 						end,
 					},
 					ScrollArrow {
+						Name = "DownArrow",
 						Direction = "Down",
 						Activated = function()
 							local p = unwrap(canvasPosition) or Vector2.zero
@@ -174,6 +176,7 @@ return function(props: ScrollFrameProperties): Frame
 
 				[Children] = {
 					ScrollArrow {
+						Name = "LeftArrow",
 						Direction = "Left",
 						Activated = function()
 							local p = unwrap(canvasPosition) or Vector2.zero
@@ -184,6 +187,7 @@ return function(props: ScrollFrameProperties): Frame
 						end,
 					},
 					ScrollArrow {
+						Name = "RightArrow",
 						Direction = "Right",
 						Activated = function()
 							local p = unwrap(canvasPosition) or Vector2.zero
@@ -229,6 +233,7 @@ return function(props: ScrollFrameProperties): Frame
 			New "ScrollingFrame" {
 				[Ref] = scrollFrame,
 
+				Name = "Canvas",
 				Size = UDim2.fromScale(1, 1),
 				CanvasSize = Computed(function()
 					local s = unwrap(contentSize) or Vector2.zero
