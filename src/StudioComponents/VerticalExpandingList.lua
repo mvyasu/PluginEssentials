@@ -18,9 +18,13 @@ local Children = Fusion.Children
 local Computed = Fusion.Computed
 local Hydrate = Fusion.Hydrate
 local New = Fusion.New
+local Value = Fusion.Value
+local Spring = Fusion.Spring
+local Out = Fusion.Out
 
 local COMPONENT_ONLY_PROPERTIES = {
 	"Padding",
+	"AutomaticSize",
 }
 
 type VerticalExpandingListProperties = {
@@ -31,11 +35,25 @@ type VerticalExpandingListProperties = {
 return function(props: VerticalExpandingListProperties): Frame
 	local hydrateProps = stripProps(props, COMPONENT_ONLY_PROPERTIES)
 
+	local contentSize = Value(Vector2.new(0,0))
+
 	return Hydrate(
 		BoxBorder {
 			[Children] = Background {
-				Size = UDim2.fromScale(1, 0),
-				AutomaticSize = Enum.AutomaticSize.Y,
+				ClipsDescendants = true,
+				Size = Spring(Computed(function()
+					local mode = unwrap(props.AutomaticSize or Enum.AutomaticSize.Y) -- Custom autosize since engine sizing is unreliable
+					if mode == Enum.AutomaticSize.Y then
+						local s = unwrap(contentSize)
+						if s then
+							return UDim2.new(1,0,0,s.Y)
+						else
+							return UDim2.new(1,0,0,0)
+						end
+					else
+						return props.Size or UDim2.new(1,0,0,0)
+					end
+				end), 40),
 
 				[Children] = New "UIListLayout" {
 					SortOrder = Enum.SortOrder.LayoutOrder,
@@ -43,6 +61,7 @@ return function(props: VerticalExpandingListProperties): Frame
 					Padding = Computed(function()
 						return unwrap(props.Padding) or UDim.new(0, 10)
 					end),
+					[Out "AbsoluteContentSize"] = contentSize,
 				}
 			}
 		}

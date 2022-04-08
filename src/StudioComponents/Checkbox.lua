@@ -21,6 +21,7 @@ local OnEvent = Fusion.OnEvent
 local Computed = Fusion.Computed
 local Children = Fusion.Children
 local Hydrate = Fusion.Hydrate
+local Spring = Fusion.Spring
 
 local INDICATOR_IMAGE = "rbxassetid://6652838434"
 local COMPONENT_ONLY_PROPERTIES = {
@@ -120,7 +121,7 @@ return function(props: CheckboxProperties): Frame
 				end,
 			},
 			BoxBorder {
-				Color = themeProvider:GetColor(Enum.StudioStyleGuideColor.CheckedFieldBorder, mainModifier),
+				Color = Spring(themeProvider:GetColor(Enum.StudioStyleGuideColor.CheckedFieldBorder, mainModifier), 40),
 
 				[Children] = New "Frame" {
 					Name = "Box",
@@ -130,7 +131,7 @@ return function(props: CheckboxProperties): Frame
 					Position = Computed(function()
 						return UDim2.fromScale(unwrap(boxHorizontalScale), 0)
 					end),
-					BackgroundColor3 = themeProvider:GetColor(Enum.StudioStyleGuideColor.CheckedFieldBackground, backModifier),
+					BackgroundColor3 = Spring(themeProvider:GetColor(Enum.StudioStyleGuideColor.CheckedFieldBackground, backModifier), 40),
 					Size = UDim2.fromOffset(15, 15),
 
 					[Children] = New "ImageLabel" {
@@ -143,10 +144,10 @@ return function(props: CheckboxProperties): Frame
 						Size = UDim2.fromOffset(13, 13),
 						Position = UDim2.fromScale(.5, .5),
 						Image = INDICATOR_IMAGE,
-						ImageColor3 = Computed(function()
+						ImageColor3 = Spring(Computed(function()
 							local indicatorColor = unwrap(checkFieldIndicatorColor)
 							return if unwrap(isIndeterminate) then Color3.fromRGB(255, 255, 255) else indicatorColor
-						end),
+						end), 40),
 						ImageRectOffset = Computed(function()
 							if unwrap(isIndeterminate) then
 								return if unwrap(themeProvider.IsDark) then Vector2.new(13, 0) else Vector2.new(26, 0)
