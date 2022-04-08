@@ -9,7 +9,7 @@ type ShadowProperties = {
 local Plugin = script:FindFirstAncestorWhichIsA("Plugin")
 local Fusion = require(Plugin:FindFirstChild("Fusion", true))
 
-local StudioComponents = Plugin:FindFirstChild("StudioComponents", true)
+local StudioComponents = script.Parent
 local StudioComponentsUtil = StudioComponents:FindFirstChild("Util")
 
 local themeProvider = require(StudioComponentsUtil.themeProvider)
