@@ -32,7 +32,8 @@ This is a Fusion port of [StudioComponents](https://github.com/sircfenner/Studio
 | [IconButton](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/IconButton.lua) | A button with an image on it instead of text. | TextButton |
 | [Checkbox](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/Checkbox.lua) | A checkbox that reacts to different states like hover, checked, indeterminate, and disabled. | Frame |
 | [ClassIcon](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/ClassIcon.lua) | An image of a given ClassName from the user's installed Studio icon set. | ImageLabel |
-| [Shadow](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/Shadow.lua) | A subtle shadow positioned on the side of your choosing | ImageLabel |
+| [Shadow](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/Shadow.lua) | A subtle shadow positioned on the side of your choosing. | ImageLabel |
+| [Loading](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/Loading.lua) | An animated component to display whilst something else loads. | Frame |
 | [Dropdown](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/Dropdown/init.lua) | A button that shows the selected item and a list of items in a dropdown when clicking on it. | Frame |
 | [ColorPicker](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/ColorPicker.lua) | An HSV color picker that uses a value slider. | Frame |
 | [ScrollFrame](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/ScrollFrame/init.lua) | A custom scrolling frame that doesn't use Roblox's ScrollingFrame. | Frame |
