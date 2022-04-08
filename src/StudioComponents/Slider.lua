@@ -70,16 +70,24 @@ return function(props: SliderProperties): TextButton
 			return Vector2.new(unwrap(props.Step) or -1, 0)
 		end),
 		OnChange = function(newValue: Vector2)
-			inputValue:set(newValue.X)
 			if props.OnChange then
 				props.OnChange(newValue.X)
 			end
 		end,
 	})
 
+	local cleanupDraggingObserver = Observer(isDragging):onChange(function()
+		inputValue:set(unwrap(currentValue).X)
+	end)
+
 	local cleanupInputValueObserver = Observer(inputValue):onChange(function()
 		currentValue:set(Vector2.new(unwrap(inputValue, false), 0))
 	end)
+
+	local function cleanupCallback()
+		cleanupDraggingObserver()
+		cleanupInputValueObserver()
+	end
 
 	local zIndex = Computed(function()
 		return (unwrap(props.ZIndex) or 0) + 1
@@ -115,7 +123,7 @@ return function(props: SliderProperties): TextButton
 		Size = UDim2.new(1, 0, 0, 22),
 		ZIndex = zIndex,
 		BackgroundTransparency = 1,
-		[Cleanup] = cleanupInputValueObserver,
+		[Cleanup] = cleanupCallback,
 
 		[Children] = {
 			BoxBorder {
