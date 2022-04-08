@@ -23,6 +23,7 @@ local Hydrate = Fusion.Hydrate
 local OnEvent = Fusion.OnEvent
 local Value = Fusion.Value
 local New = Fusion.New
+local Spring = Fusion.Spring
 
 local PLACEHOLDER_TEXT_COLOR = Color3.fromRGB(102, 102, 102)
 
@@ -66,16 +67,16 @@ return function(props: TextInputProperties): TextLabel
 	local absoluteTextBoxSize = Value(Vector2.new())
 
 	local newTextBox = BoxBorder {
-		Color = themeProvider:GetColor(Enum.StudioStyleGuideColor.InputFieldBorder, borderModifier),
+		Color = Spring(themeProvider:GetColor(Enum.StudioStyleGuideColor.InputFieldBorder, borderModifier), 40),
 
 		[Children] = New "TextBox" {
 			Name = "TextInput",
 			Size = UDim2.new(1, 0, 0, 25),
-			BackgroundColor3 = themeProvider:GetColor(Enum.StudioStyleGuideColor.InputFieldBackground, mainModifier),
+			BackgroundColor3 = Spring(themeProvider:GetColor(Enum.StudioStyleGuideColor.InputFieldBackground, mainModifier), 40),
 			Font = themeProvider:GetFont("Default"),
 			Text = "",
 			TextSize = constants.TextSize,
-			TextColor3 = themeProvider:GetColor(Enum.StudioStyleGuideColor.MainText, mainModifier),
+			TextColor3 = Spring(themeProvider:GetColor(Enum.StudioStyleGuideColor.MainText, mainModifier), 40),
 			PlaceholderColor3 = PLACEHOLDER_TEXT_COLOR,
 			TextXAlignment = Computed(function()
 				local bounds = unwrap(currentTextBounds).X + 5 -- because of padding
