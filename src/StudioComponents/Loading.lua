@@ -60,9 +60,10 @@ return function(props: LoadingProperties): Frame
 	end
 
 	startMotion()
-	Observer(isEnabled):onChange(startMotion)
+	local observeDisconnect = Observer(isEnabled):onChange(startMotion)
 
 	local function haltAnim()
+		observeDisconnect()
 		if animThread then
 			task.cancel(animThread)
 			animThread = nil
