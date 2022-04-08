@@ -21,6 +21,7 @@ local New = Fusion.New
 local Spring = Fusion.Spring
 local Observer = Fusion.Observer
 local Children = Fusion.Children
+local Cleanup = Fusion.Cleanup
 
 local COMPONENT_ONLY_PROPERTIES = {
 	"Enabled",
@@ -46,12 +47,19 @@ return function(props: LoadingProperties): Frame
 		end
 	end
 
-	task.defer(startMotion)
+    local animThread = task.defer(startMotion)
 	Observer(props.Enabled):onChange(function()
 		if unwrap(props.Enabled) then
-			task.defer(startMotion)
+			animThread = task.defer(startMotion)
 		end
 	end)
+
+    local function haltAnim()
+        if animThread then
+            task.cancel(animThread)
+            animThread = nil
+        end
+    end
 
 	local alphaA = Computed(function()
 		local t = (unwrap(time) + 0.25) * pi4
@@ -98,6 +106,7 @@ return function(props: LoadingProperties): Frame
 		Size = UDim2.new(0,constants.TextSize*4, 0,constants.TextSize*1.5),
 		Visible = props.Enabled,
 		ClipsDescendants = true,
+        [Cleanup] = haltAnim,
 
 		[Children] = {
 			New "Frame" {
