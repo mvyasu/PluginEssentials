@@ -54,7 +54,7 @@ type DragInputProperites = {
 	Step: vector2Input,
 }
 
-return function(props: DragInputProperites): (vector2Value, types.Computed<Vector2>)
+return function(props: DragInputProperites): (vector2Value, types.Computed<Vector2>, types.Value<boolean>)
 	local isEnabled = getState(props.Enabled, true)
 	local isDragging = Value(false)
 
