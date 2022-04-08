@@ -24,6 +24,8 @@ This is a Fusion port of [StudioComponents](https://github.com/sircfenner/Studio
 | Component | Description | Returns |
 | --- | --- | --- |
 | [Background](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/Background.lua) | A borderless Frame with a background color that matches the user's current theme. | Frame |
+| [Label](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/Label.lua) | A simple text label following Studio style guidelines for body text. | TextLabel |
+| [Title](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/Title.lua) | A simple text label following Studio style guidelines for title text. | TextLabel |
 | [BaseButton](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/BaseButton.lua) | A TextButton that reacts to different states like hover, press, and disabled. | TextButton |
 | [Button](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/Button.lua) | BaseButton, but with a different name. | TextButton |
 | [MainButton](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/MainButton.lua) | BaseButton, but uses the style of a main button, which is usually a blue background color. | TextButton |
