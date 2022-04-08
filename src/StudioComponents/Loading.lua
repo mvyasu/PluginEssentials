@@ -37,32 +37,39 @@ local clock = os.clock
 local pi4 = 12.566370614359172 --4*pi
 
 return function(props: LoadingProperties): Frame
-    local isEnabled = getState(props.Enabled, true)
+	local isEnabled = getState(props.Enabled, true)
 	local time = Value(0)
 
+	local animThread = nil
+
 	local function startMotion()
-		local startTime = clock()
-		while unwrap(isEnabled) do
-			time:set(clock()-startTime)
-			task.wait(1/25) -- Springs will smooth out the motion so we needn't bother with high refresh rate here
+		if not unwrap(isEnabled) then return end
+
+		if animThread then
+			task.cancel(animThread)
+			animThread = nil
+		end
+
+		animThread = task.defer(function()
+			local startTime = clock()
+			while unwrap(isEnabled) do
+				time:set(clock()-startTime)
+				task.wait(1/25) -- Springs will smooth out the motion so we needn't bother with high refresh rate here
+			end
+		end)
+	end
+
+	startMotion()
+	Observer(isEnabled):onChange(startMotion)
+
+	local function haltAnim()
+		if animThread then
+			task.cancel(animThread)
+			animThread = nil
 		end
 	end
 
-    local animThread = task.defer(startMotion)
-	Observer(isEnabled):onChange(function()
-		if unwrap(isEnabled) then
-			animThread = task.defer(startMotion)
-		end
-	end)
-
-    local function haltAnim()
-        if animThread then
-            task.cancel(animThread)
-            animThread = nil
-        end
-    end
-
-    local light = themeProvider:GetColor(Enum.StudioStyleGuideColor.Light, Enum.StudioStyleGuideModifier.Default)
+	local light = themeProvider:GetColor(Enum.StudioStyleGuideColor.Light, Enum.StudioStyleGuideModifier.Default)
 	local accent = themeProvider:GetColor(Enum.StudioStyleGuideColor.DialogMainButton, Enum.StudioStyleGuideModifier.Default)
 
 	local alphaA = Computed(function()
@@ -102,7 +109,7 @@ return function(props: LoadingProperties): Frame
 		Size = UDim2.new(0,constants.TextSize*4, 0,constants.TextSize*1.5),
 		Visible = isEnabled,
 		ClipsDescendants = true,
-        [Cleanup] = haltAnim,
+		[Cleanup] = haltAnim,
 
 		[Children] = {
 			New "Frame" {
