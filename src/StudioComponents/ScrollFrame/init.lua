@@ -73,6 +73,10 @@ return function(props: ScrollFrameProperties): Frame
 		showVertBar:set(size.Y < canvas.Y)
 		showHoriBar:set(size.X < canvas.X)
 	end
+	
+	local childZIndex = Computed(function()
+		return unwrap(props.ZIndex) + 10
+	end)
 
 	local containerFrame = New "Frame" {
 		Name = "ScrollFrame",
@@ -82,7 +86,7 @@ return function(props: ScrollFrameProperties): Frame
 			New "Frame" {
 				Name = "VerticalBar",
 				Visible = showVertBar,
-				ZIndex = 2,
+				ZIndex = childZIndex,
 				BackgroundColor3 = themeProvider:GetColor(Enum.StudioStyleGuideColor.ScrollBarBackground),
 				BorderColor3 = themeProvider:GetColor(Enum.StudioStyleGuideColor.Border),
 				BorderMode = Enum.BorderMode.Outline,
@@ -108,6 +112,7 @@ return function(props: ScrollFrameProperties): Frame
 				[Children] = {
 					ScrollArrow {
 						Name = "UpArrow",
+						ZIndex = childZIndex,
 						Direction = "Up",
 						Activated = function()
 							local p = unwrap(canvasPosition) or Vector2.zero
@@ -119,6 +124,7 @@ return function(props: ScrollFrameProperties): Frame
 					},
 					ScrollArrow {
 						Name = "DownArrow",
+						ZIndex = childZIndex,
 						Direction = "Down",
 						Activated = function()
 							local p = unwrap(canvasPosition) or Vector2.zero
@@ -132,7 +138,7 @@ return function(props: ScrollFrameProperties): Frame
 					},
 					New "Frame" {
 						Name = "Handle",
-						ZIndex = 10,
+						ZIndex = childZIndex,
 						Size = Computed(function()
 							local window = unwrap(windowSize) or Vector2.zero
 							local content = unwrap(contentSize) or Vector2.zero
@@ -164,7 +170,7 @@ return function(props: ScrollFrameProperties): Frame
 			New "Frame" {
 				Name = "HorizontalBar",
 				Visible = showHoriBar,
-				ZIndex = 2,
+				ZIndex = childZIndex,
 				BackgroundColor3 = themeProvider:GetColor(Enum.StudioStyleGuideColor.ScrollBarBackground),
 				BorderColor3 = themeProvider:GetColor(Enum.StudioStyleGuideColor.Border),
 				BorderMode = Enum.BorderMode.Outline,
@@ -176,6 +182,7 @@ return function(props: ScrollFrameProperties): Frame
 				[Children] = {
 					ScrollArrow {
 						Name = "LeftArrow",
+						ZIndex = childZIndex,
 						Direction = "Left",
 						Activated = function()
 							local p = unwrap(canvasPosition) or Vector2.zero
@@ -187,6 +194,7 @@ return function(props: ScrollFrameProperties): Frame
 					},
 					ScrollArrow {
 						Name = "RightArrow",
+						ZIndex = childZIndex,
 						Direction = "Right",
 						Activated = function()
 							local p = unwrap(canvasPosition) or Vector2.zero
@@ -200,7 +208,7 @@ return function(props: ScrollFrameProperties): Frame
 					},
 					New "Frame" {
 						Name = "Handle",
-						ZIndex = 10,
+						ZIndex = childZIndex,
 						Size = Computed(function()
 							local window = unwrap(windowSize) or Vector2.zero
 							local content = unwrap(contentSize) or Vector2.zero
@@ -234,6 +242,9 @@ return function(props: ScrollFrameProperties): Frame
 
 				Name = "Canvas",
 				Size = UDim2.fromScale(1, 1),
+				ZIndex = Computed(function()
+					return unwrap(childZIndex)-9
+				end),
 				CanvasSize = Computed(function()
 					local s = unwrap(contentSize) or Vector2.zero
 					return UDim2.fromOffset(0, s.Y)
