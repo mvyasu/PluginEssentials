@@ -11,6 +11,7 @@ local BoxBorder = require(StudioComponents.BoxBorder)
 
 local getMotionState = require(StudioComponentsUtil.getMotionState)
 local themeProvider = require(StudioComponentsUtil.themeProvider)
+local getModifier = require(StudioComponentsUtil.getModifier)
 local constants = require(StudioComponentsUtil.constants)
 local getState = require(StudioComponentsUtil.getState)
 local unwrap = require(StudioComponentsUtil.unwrap)
@@ -50,27 +51,15 @@ return function(props: CheckboxProperties): Frame
 		return unwrap(currentValue)==nil
 	end)
 
-	local mainModifier = Computed(function()
-		local isDisabled = not unwrap(isEnabled)
-		local isHovering = unwrap(isHovering)
-		if isDisabled then
-			return Enum.StudioStyleGuideModifier.Disabled
-		elseif isHovering then
-			return Enum.StudioStyleGuideModifier.Hover
-		end
-		return Enum.StudioStyleGuideModifier.Default
-	end)
+	local mainModifier = getModifier({
+		Enabled = isEnabled,
+		Hovering = isHovering,
+	})
 
-	local backModifier = Computed(function()
-		local isDisabled = not unwrap(isEnabled)
-		local isChecked = unwrap(currentValue)
-		if isDisabled then
-			return Enum.StudioStyleGuideModifier.Disabled
-		elseif isChecked then
-			return Enum.StudioStyleGuideModifier.Selected
-		end
-		return Enum.StudioStyleGuideModifier.Default
-	end)
+	local backModifier = getModifier({
+		Enabled = isEnabled,
+		Selected = currentValue,
+	})
 
 	local checkFieldIndicatorColor = themeProvider:GetColor(Enum.StudioStyleGuideColor.CheckedFieldIndicator, mainModifier)
 

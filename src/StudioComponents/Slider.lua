@@ -12,6 +12,7 @@ local BoxBorder = require(StudioComponents.BoxBorder)
 local getMotionState = require(StudioComponentsUtil.getMotionState)
 local themeProvider = require(StudioComponentsUtil.themeProvider)
 local getDragInput = require(StudioComponentsUtil.getDragInput)
+local getModifier = require(StudioComponentsUtil.getModifier)
 local stripProps = require(StudioComponentsUtil.stripProps)
 local constants = require(StudioComponentsUtil.constants)
 local getState = require(StudioComponentsUtil.getState)
@@ -93,27 +94,15 @@ return function(props: SliderProperties): TextButton
 		return (unwrap(props.ZIndex) or 0) + 1
 	end)
 
-	local mainModifier = Computed(function()
-		local isDisabled = not unwrap(isEnabled)
-		if isDisabled then
-			return Enum.StudioStyleGuideModifier.Disabled
-		end
-		return Enum.StudioStyleGuideModifier.Default
-	end)
-
-	local handleModifier = Computed(function()
-		local isDisabled = not unwrap(isEnabled)
-		local isHovering = unwrap(isHovering)
-		local isDragging = unwrap(isDragging)
-		if isDisabled then
-			return Enum.StudioStyleGuideModifier.Disabled
-		elseif isDragging then
-			return Enum.StudioStyleGuideModifier.Selected
-		elseif isHovering then
-			return Enum.StudioStyleGuideModifier.Hover
-		end
-		return Enum.StudioStyleGuideModifier.Default
-	end)
+	local mainModifier = getModifier({
+		Enabled = isEnabled,
+	})
+	
+	local handleModifier = getModifier({
+		Enabled = isEnabled,
+		Selected = isDragging,
+		Hovering = isHovering,
+	})
 
 	local handleFill = themeProvider:GetColor(Enum.StudioStyleGuideColor.Button)
 	local handleBorder = themeProvider:GetColor(Enum.StudioStyleGuideColor.InputFieldBorder, handleModifier)

@@ -13,6 +13,7 @@ local DropdownItem = require(script.DropdownItem)
 
 local getMotionState = require(StudioComponentsUtil.getMotionState)
 local themeProvider = require(StudioComponentsUtil.themeProvider)
+local getModifier = require(StudioComponentsUtil.getModifier)
 local constants = require(StudioComponentsUtil.constants)
 local getState = require(StudioComponentsUtil.getState)
 local unwrap = require(StudioComponentsUtil.unwrap)
@@ -60,16 +61,10 @@ return function(props: DropdownProperties): Frame
 		return isInputEnabled and not isEmpty
 	end)
 
-	local modifier = Computed(function()
-		local isHovering = unwrap(isHovering)
-		local isEnabled = unwrap(isEnabled)
-		if not isEnabled then
-			return Enum.StudioStyleGuideModifier.Disabled
-		elseif isHovering then
-			return Enum.StudioStyleGuideModifier.Hover
-		end
-		return Enum.StudioStyleGuideModifier.Default
-	end)
+	local modifier = getModifier({
+		Enabled = isEnabled,
+		Hovering = isHovering,
+	})
 	
 	local backgroundStyleGuideColor = Computed(function()
 		local isHovering = unwrap(isHovering)

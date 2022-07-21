@@ -13,6 +13,7 @@ local Label = require(StudioComponents.Label)
 
 local getMotionState = require(StudioComponentsUtil.getMotionState)
 local themeProvider = require(StudioComponentsUtil.themeProvider)
+local getModifier = require(StudioComponentsUtil.getModifier)
 local stripProps = require(StudioComponentsUtil.stripProps)
 local constants = require(StudioComponentsUtil.constants)
 local getState = require(StudioComponentsUtil.getState)
@@ -47,20 +48,15 @@ type VerticalExpandingListProperties = {
 return function(props: VerticalExpandingListProperties): Frame
 	local shouldBeCollapsed = getState(props.Collapsed, false, "Value")
 	local isEnabled = getState(props.Enabled, true)
-
-	local hydrateProps = stripProps(props, COMPONENT_ONLY_PROPERTIES)
-
 	local isHovering = Value(false)
-	local modifier = Computed(function()
-		local isHovering = unwrap(isHovering)
-		local isDisabled = not unwrap(isEnabled)
-		if isDisabled then
-			return Enum.StudioStyleGuideModifier.Disabled
-		elseif isHovering then
-			return Enum.StudioStyleGuideModifier.Hover
-		end
-		return if unwrap(themeProvider.IsDark) then Enum.StudioStyleGuideModifier.Default else Enum.StudioStyleGuideModifier.Pressed
-	end)
+
+	local modifier = getModifier({
+		Enabled = isEnabled,
+		Hovering = isHovering,
+		Otherwise = Computed(function()
+			return if unwrap(themeProvider.IsDark) then Enum.StudioStyleGuideModifier.Default else Enum.StudioStyleGuideModifier.Pressed
+		end),
+	})
 
 	local isCollapsed = Computed(function()
 		local shouldBeCollapsed = unwrap(shouldBeCollapsed)
@@ -138,7 +134,6 @@ return function(props: VerticalExpandingListProperties): Frame
 							Image = "rbxassetid://5607705156",
 							ImageColor3 = getMotionState(Computed(function()
 								local baseColor = Color3.fromRGB(170, 170, 170)
-								local themeModifier = unwrap(themeColorModifier)
 								if unwrap(isEnabled) then
 									return baseColor
 								end
@@ -175,5 +170,5 @@ return function(props: VerticalExpandingListProperties): Frame
 			},
 			props[Children],
 		}
-	})(hydrateProps)
+	})(stripProps(props, COMPONENT_ONLY_PROPERTIES))
 end

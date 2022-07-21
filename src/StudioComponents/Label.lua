@@ -9,6 +9,7 @@ local StudioComponentsUtil = StudioComponents:FindFirstChild("Util")
 
 local getMotionState = require(StudioComponentsUtil.getMotionState)
 local themeProvider = require(StudioComponentsUtil.themeProvider)
+local getModifier = require(StudioComponentsUtil.getModifier)
 local stripProps = require(StudioComponentsUtil.stripProps)
 local constants = require(StudioComponentsUtil.constants)
 local getState = require(StudioComponentsUtil.getState)
@@ -35,6 +36,10 @@ return function(props: LabelProperties): TextLabel
 	local isEnabled = getState(props.Enabled, true)
 	local textSize = props.TextSize or constants.TextSize
 
+	local mainModifier = getModifier({
+		Enabled = isEnabled
+	})
+
 	local newLabel = New "TextLabel" {
 		Name = "Label",
 		Position = UDim2.fromScale(0, 0),
@@ -44,12 +49,7 @@ return function(props: LabelProperties): TextLabel
 		end),
 		Text = "Label",
 		Font = themeProvider:GetFont("Default"),
-		TextColor3 = props.TextColor3 or getMotionState(themeProvider:GetColor(props.TextColorStyle or Enum.StudioStyleGuideColor.MainText, Computed(function()
-			if not unwrap(isEnabled) then
-				return Enum.StudioStyleGuideModifier.Disabled
-			end
-			return Enum.StudioStyleGuideModifier.Default
-		end)), "Spring", 40),
+		TextColor3 = props.TextColor3 or getMotionState(themeProvider:GetColor(props.TextColorStyle or Enum.StudioStyleGuideColor.MainText, mainModifier), "Spring", 40),
 		TextSize = textSize,
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,

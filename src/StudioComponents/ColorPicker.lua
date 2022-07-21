@@ -9,12 +9,12 @@ local StudioComponentsUtil = StudioComponents:FindFirstChild("Util")
 
 local BoxBorder = require(StudioComponents.BoxBorder)
 
-local getState = require(StudioComponentsUtil.getState)
 local themeProvider = require(StudioComponentsUtil.themeProvider)
 local getDragInput = require(StudioComponentsUtil.getDragInput)
+local stripProps = require(StudioComponentsUtil.stripProps)
+local getState = require(StudioComponentsUtil.getState)
 local unwrap = require(StudioComponentsUtil.unwrap)
 local types = require(StudioComponentsUtil.types)
-local stripProps = require(StudioComponentsUtil.stripProps)
 
 local New = Fusion.New
 local Value = Fusion.Value
@@ -114,15 +114,7 @@ return function(props: ColorPickerProperties): Frame
 		end
 	end)
 
-	local modifier = Computed(function()
-		local isDisabled = not unwrap(isEnabled)
-		if isDisabled then
-			return Enum.StudioStyleGuideModifier.Disabled
-		end
-		return Enum.StudioStyleGuideModifier.Default
-	end)
-
-	local zIndex = Computed(function()
+	local childZIndex = Computed(function()
 		return (unwrap(props.ZIndex) or 0) + 1
 	end)
 
@@ -139,6 +131,7 @@ return function(props: ColorPickerProperties): Frame
 			BoxBorder {
 				[Children] = New "TextButton" {
 					Name = "Slider",
+					ZIndex = childZIndex,
 					Active = false,
 					AutoButtonColor = false,
 					Text = "",
@@ -162,6 +155,7 @@ return function(props: ColorPickerProperties): Frame
 					end),
 					BorderSizePixel = 0,
 					BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+
 					[Ref] = sliderRef,
 
 					[Children] = {
@@ -181,6 +175,7 @@ return function(props: ColorPickerProperties): Frame
 						},
 						New "ImageLabel" {
 							Name = "Arrow",
+							ZIndex = childZIndex,
 							AnchorPoint = Computed(function()
 								if unwrap( isHorizontalList) then
 									return Vector2.new(0, .5)
@@ -211,6 +206,7 @@ return function(props: ColorPickerProperties): Frame
 			BoxBorder {
 				[Children] = New "ImageButton" {
 					Name = "Region",
+					ZIndex = childZIndex,
 					Active = false,
 					AutoButtonColor = false,
 					Size = Computed(function()
@@ -229,6 +225,7 @@ return function(props: ColorPickerProperties): Frame
 
 					[Children] = New "Frame" {
 						Name = "Indicator",
+						ZIndex = childZIndex,
 						AnchorPoint = Vector2.new(0.5, 0.5),
 						Position = Computed(function()
 							local hue, sat, val = unwrap(currentColor):ToHSV()
@@ -240,6 +237,7 @@ return function(props: ColorPickerProperties): Frame
 						[Children] = {
 							New "Frame" {
 								Name = "Vertical",
+								ZIndex = childZIndex,
 								Position = UDim2.fromOffset(8, 0),
 								Size = UDim2.new(0, 2, 1, 0),
 								BorderSizePixel = 0,
@@ -247,6 +245,7 @@ return function(props: ColorPickerProperties): Frame
 							},
 							New "Frame" {
 								Name = "Horizontal",
+								ZIndex = childZIndex,
 								Position = UDim2.fromOffset(0, 8),
 								Size = UDim2.new(1, 0, 0, 2),
 								BorderSizePixel = 0,

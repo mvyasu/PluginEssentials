@@ -8,8 +8,8 @@ local BoxBorder = require(StudioComponents.BoxBorder)
 
 local getMotionState = require(StudioComponentsUtil.getMotionState)
 local themeProvider = require(StudioComponentsUtil.themeProvider)
+local getModifier = require(StudioComponentsUtil.getModifier)
 local stripProps = require(StudioComponentsUtil.stripProps)
-local constants = require(StudioComponentsUtil.constants)
 local getState = require(StudioComponentsUtil.getState)
 local unwrap = require(StudioComponentsUtil.unwrap)
 local types = require(StudioComponentsUtil.types)
@@ -46,22 +46,12 @@ return function(props: IconButtonProperties): TextButton
 	local isHovering = Value(false)
 	local isPressed = Value(false)
 
-	local modifier = Computed(function()
-		local isSelected = unwrap(props.Selected)
-		local isDisabled = not unwrap(isEnabled)
-		local isHovering = unwrap(isHovering)
-		local isPressed = unwrap(isPressed)
-		if isDisabled then
-			return Enum.StudioStyleGuideModifier.Disabled
-		elseif isSelected then
-			return Enum.StudioStyleGuideModifier.Selected
-		elseif isPressed then
-			return Enum.StudioStyleGuideModifier.Pressed
-		elseif isHovering then
-			return Enum.StudioStyleGuideModifier.Hover
-		end
-		return Enum.StudioStyleGuideModifier.Default
-	end)
+	local modifier = getModifier({
+		Enabled = props.Enabled,
+		Selected = props.Selected,
+		Hovering = isHovering,
+		Pressed = isPressed,
+	})
 
 	local newBaseButton = BoxBorder {
 		Color = getMotionState(themeProvider:GetColor(props.BorderColorStyle or Enum.StudioStyleGuideColor.CheckedFieldBorder, modifier), "Spring", 40),

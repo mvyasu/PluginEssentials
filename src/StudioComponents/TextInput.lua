@@ -11,6 +11,7 @@ local BoxBorder = require(StudioComponents.BoxBorder)
 
 local getMotionState = require(StudioComponentsUtil.getMotionState)
 local themeProvider = require(StudioComponentsUtil.themeProvider)
+local getModifier = require(StudioComponentsUtil.getModifier)
 local stripProps = require(StudioComponentsUtil.stripProps)
 local constants = require(StudioComponentsUtil.constants)
 local getState = require(StudioComponentsUtil.getState)
@@ -42,26 +43,15 @@ return function(props: TextInputProperties): TextLabel
 	local isHovering = Value(false)
 	local isFocused = Value(false)
 
-	local mainModifier = Computed(function()
-		if not unwrap(isEnabled) then
-			return Enum.StudioStyleGuideModifier.Disabled
-		end
-		return Enum.StudioStyleGuideModifier.Default
-	end)
-
-	local borderModifier = Computed(function()
-		local isDisabled = not unwrap(isEnabled)
-		local isHovering = unwrap(isHovering)
-		local isFocused = unwrap(isFocused)
-		if isDisabled then
-			return Enum.StudioStyleGuideModifier.Disabled
-		elseif isFocused then
-			return Enum.StudioStyleGuideModifier.Selected
-		elseif isHovering then
-			return Enum.StudioStyleGuideModifier.Hover
-		end
-		return Enum.StudioStyleGuideModifier.Default
-	end)
+	local mainModifier = getModifier({
+		Enabled = isEnabled,
+	})
+	
+	local borderModifier = getModifier({
+		Enabled = isEnabled,
+		Selected = isFocused,
+		Hovering = isHovering,
+	})
 
 	local currentTextBounds = Value(Vector2.new())
 	local absoluteTextBoxSize = Value(Vector2.new())
