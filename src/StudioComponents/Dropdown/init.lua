@@ -11,9 +11,10 @@ local ScrollFrame = require(StudioComponents.ScrollFrame)
 local BoxBorder = require(StudioComponents.BoxBorder)
 local DropdownItem = require(script.DropdownItem)
 
-local getState = require(StudioComponentsUtil.getState)
+local getMotionState = require(StudioComponentsUtil.getMotionState)
 local themeProvider = require(StudioComponentsUtil.themeProvider)
 local constants = require(StudioComponentsUtil.constants)
+local getState = require(StudioComponentsUtil.getState)
 local unwrap = require(StudioComponentsUtil.unwrap)
 local types = require(StudioComponentsUtil.types)
 
@@ -25,7 +26,6 @@ local Children = Fusion.Children
 local OnChange = Fusion.OnChange
 local OnEvent = Fusion.OnEvent
 local Hydrate = Fusion.Hydrate
-local Spring = Fusion.Spring
 local Value = Fusion.Value
 local New = Fusion.New
 
@@ -210,7 +210,7 @@ return function(props: DropdownProperties): Frame
 					Name = "Selected",
 					Size = UDim2.fromScale(1, 1),
 					
-					BackgroundColor3 = Spring(themeProvider:GetColor(backgroundStyleGuideColor, modifier), 40),
+					BackgroundColor3 = getMotionState(themeProvider:GetColor(backgroundStyleGuideColor, modifier), "Spring", 40),
 					Text = selectedItem,
 					Font = themeProvider:GetFont("Default"),
 					TextSize = constants.TextSize,

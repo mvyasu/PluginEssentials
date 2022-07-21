@@ -6,19 +6,17 @@ local Fusion = require(Plugin:FindFirstChild("Fusion", true))
 local StudioComponents = script.Parent
 local StudioComponentsUtil = StudioComponents:FindFirstChild("Util")
 
-local getState = require(StudioComponentsUtil.getState)
+local getMotionState = require(StudioComponentsUtil.getMotionState)
 local themeProvider = require(StudioComponentsUtil.themeProvider)
+local stripProps = require(StudioComponentsUtil.stripProps)
 local constants = require(StudioComponentsUtil.constants)
 local unwrap = require(StudioComponentsUtil.unwrap)
 local types = require(StudioComponentsUtil.types)
-local stripProps = require(StudioComponentsUtil.stripProps)
-
 
 local Computed = Fusion.Computed
+local Children = Fusion.Children
 local Hydrate = Fusion.Hydrate
 local New = Fusion.New
-local Spring = Fusion.Spring
-local Children = Fusion.Children
 
 local COMPONENT_ONLY_PROPERTIES = {
 	"Progress",
@@ -43,9 +41,9 @@ return function(props: ProgressProperties): Frame
 			New "Frame" {
 				Name = "Fill",
 				BackgroundColor3 = themeProvider:GetColor(Enum.StudioStyleGuideColor.DialogMainButton),
-				Size = Spring(Computed(function()
+				Size = getMotionState(Computed(function()
 					return UDim2.fromScale(unwrap(props.Progress), 1)
-				end), 40),
+				end), "Spring", 40),
 
 				[Children] = {
 					New "UICorner" {

@@ -7,19 +7,17 @@ local Fusion = require(Plugin:FindFirstChild("Fusion", true))
 local StudioComponents = script.Parent
 local StudioComponentsUtil = StudioComponents:FindFirstChild("Util")
 
-local getState = require(StudioComponentsUtil.getState)
+local getMotionState = require(StudioComponentsUtil.getMotionState)
 local themeProvider = require(StudioComponentsUtil.themeProvider)
+local stripProps = require(StudioComponentsUtil.stripProps)
 local constants = require(StudioComponentsUtil.constants)
+local getState = require(StudioComponentsUtil.getState)
 local unwrap = require(StudioComponentsUtil.unwrap)
 local types = require(StudioComponentsUtil.types)
-local stripProps = require(StudioComponentsUtil.stripProps)
-
 
 local Computed = Fusion.Computed
 local Hydrate = Fusion.Hydrate
-local Value = Fusion.Value
 local New = Fusion.New
-local Spring = Fusion.Spring
 
 local COMPONENT_ONLY_PROPERTIES = {
 	"Enabled",
@@ -46,12 +44,12 @@ return function(props: LabelProperties): TextLabel
 		end),
 		Text = "Label",
 		Font = themeProvider:GetFont("Default"),
-		TextColor3 = props.TextColor3 or Spring(themeProvider:GetColor(props.TextColorStyle or Enum.StudioStyleGuideColor.MainText, Computed(function()
+		TextColor3 = props.TextColor3 or getMotionState(themeProvider:GetColor(props.TextColorStyle or Enum.StudioStyleGuideColor.MainText, Computed(function()
 			if not unwrap(isEnabled) then
 				return Enum.StudioStyleGuideModifier.Disabled
 			end
 			return Enum.StudioStyleGuideModifier.Default
-		end)), 40),
+		end)), "Spring", 40),
 		TextSize = textSize,
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,

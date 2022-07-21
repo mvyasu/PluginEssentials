@@ -6,19 +6,18 @@ local Fusion = require(Plugin:FindFirstChild("Fusion", true))
 local StudioComponents = script.Parent
 local StudioComponentsUtil = StudioComponents:FindFirstChild("Util")
 
-local getState = require(StudioComponentsUtil.getState)
+local getMotionState = require(StudioComponentsUtil.getMotionState)
 local themeProvider = require(StudioComponentsUtil.themeProvider)
+local stripProps = require(StudioComponentsUtil.stripProps)
 local constants = require(StudioComponentsUtil.constants)
+local getState = require(StudioComponentsUtil.getState)
 local unwrap = require(StudioComponentsUtil.unwrap)
 local types = require(StudioComponentsUtil.types)
-local stripProps = require(StudioComponentsUtil.stripProps)
-
 
 local Computed = Fusion.Computed
 local Hydrate = Fusion.Hydrate
 local Value = Fusion.Value
 local New = Fusion.New
-local Spring = Fusion.Spring
 local Observer = Fusion.Observer
 local Children = Fusion.Children
 local Cleanup = Fusion.Cleanup
@@ -28,7 +27,7 @@ local COMPONENT_ONLY_PROPERTIES = {
 }
 
 type LoadingProperties = {
-	Enabled: (boolean | types.StateObject<boolean>)?,
+	Enabled: types.CanBeState<boolean>?,
 	[any]: any,
 }
 
@@ -82,27 +81,29 @@ return function(props: LoadingProperties): Frame
 		return (cos(t)+1)/2
 	end)
 
-	local colorA = Spring(Computed(function()
+	local colorA = getMotionState(Computed(function()
 		return unwrap(light):Lerp(unwrap(accent), unwrap(alphaA))
-	end), 40)
-	local colorB = Spring(Computed(function()
-		return unwrap(light):Lerp(unwrap(accent), unwrap(alphaB))
-	end), 40)
+	end), "Spring", 40)
 
-	local sizeA = Spring(Computed(function()
+	local colorB = getMotionState(Computed(function()
+		return unwrap(light):Lerp(unwrap(accent), unwrap(alphaB))
+	end), "Spring", 40)
+
+	local sizeA = getMotionState(Computed(function()
 		local alpha = unwrap(alphaA)
 		return UDim2.fromScale(
 			0.2,
 			0.5 + alpha*0.5
 		)
-	end), 40)
-	local sizeB = Spring(Computed(function()
+	end), "Spring", 40)
+
+	local sizeB = getMotionState(Computed(function()
 		local alpha = unwrap(alphaB)
 		return UDim2.fromScale(
 			0.2,
 			0.5 + alpha*0.5
 		)
-	end), 40)
+	end), "Spring", 40)
 
 	local frame = New "Frame" {
 		Name = "Loading",

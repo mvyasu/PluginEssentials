@@ -9,12 +9,13 @@ local StudioComponentsUtil = StudioComponents:FindFirstChild("Util")
 
 local BoxBorder = require(StudioComponents.BoxBorder)
 
-local getState = require(StudioComponentsUtil.getState)
+local getMotionState = require(StudioComponentsUtil.getMotionState)
 local themeProvider = require(StudioComponentsUtil.themeProvider)
+local stripProps = require(StudioComponentsUtil.stripProps)
 local constants = require(StudioComponentsUtil.constants)
+local getState = require(StudioComponentsUtil.getState)
 local unwrap = require(StudioComponentsUtil.unwrap)
 local types = require(StudioComponentsUtil.types)
-local stripProps = require(StudioComponentsUtil.stripProps)
 
 local Computed = Fusion.Computed
 local OnChange = Fusion.OnChange
@@ -23,7 +24,6 @@ local Hydrate = Fusion.Hydrate
 local OnEvent = Fusion.OnEvent
 local Value = Fusion.Value
 local New = Fusion.New
-local Spring = Fusion.Spring
 
 local PLACEHOLDER_TEXT_COLOR = Color3.fromRGB(102, 102, 102)
 
@@ -67,16 +67,16 @@ return function(props: TextInputProperties): TextLabel
 	local absoluteTextBoxSize = Value(Vector2.new())
 
 	local newTextBox = BoxBorder {
-		Color = Spring(themeProvider:GetColor(Enum.StudioStyleGuideColor.InputFieldBorder, borderModifier), 40),
+		Color = getMotionState(themeProvider:GetColor(Enum.StudioStyleGuideColor.InputFieldBorder, borderModifier), "Spring", 40),
 
 		[Children] = New "TextBox" {
 			Name = "TextInput",
 			Size = UDim2.new(1, 0, 0, 25),
-			BackgroundColor3 = Spring(themeProvider:GetColor(Enum.StudioStyleGuideColor.InputFieldBackground, mainModifier), 40),
+			BackgroundColor3 = getMotionState(themeProvider:GetColor(Enum.StudioStyleGuideColor.InputFieldBackground, mainModifier), "Spring", 40),
 			Font = themeProvider:GetFont("Default"),
 			Text = "",
 			TextSize = constants.TextSize,
-			TextColor3 = Spring(themeProvider:GetColor(Enum.StudioStyleGuideColor.MainText, mainModifier), 40),
+			TextColor3 = getMotionState(themeProvider:GetColor(Enum.StudioStyleGuideColor.MainText, mainModifier), "Spring", 40),
 			PlaceholderColor3 = PLACEHOLDER_TEXT_COLOR,
 			TextXAlignment = Computed(function()
 				local bounds = unwrap(currentTextBounds).X + 5 -- because of padding
