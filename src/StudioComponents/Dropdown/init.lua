@@ -14,6 +14,7 @@ local DropdownItem = require(script.DropdownItem)
 local getMotionState = require(StudioComponentsUtil.getMotionState)
 local themeProvider = require(StudioComponentsUtil.themeProvider)
 local getModifier = require(StudioComponentsUtil.getModifier)
+local stripProps = require(StudioComponentsUtil.stripProps)
 local constants = require(StudioComponentsUtil.constants)
 local getState = require(StudioComponentsUtil.getState)
 local unwrap = require(StudioComponentsUtil.unwrap)
@@ -54,7 +55,7 @@ return function(props: DropdownProperties): Frame
 	local isHovering = Value(false)
 	local isOpen = Value(false)
 	local isEmpty = Value(false)
-	
+
 	local isEnabled = Computed(function()
 		local isInputEnabled = unwrap(isInputEnabled)
 		local isEmpty = unwrap(isEmpty)
@@ -65,7 +66,7 @@ return function(props: DropdownProperties): Frame
 		Enabled = isEnabled,
 		Hovering = isHovering,
 	})
-	
+
 	local backgroundStyleGuideColor = Computed(function()
 		local isHovering = unwrap(isHovering)
 		local isOpen = unwrap(isOpen)
@@ -74,7 +75,7 @@ return function(props: DropdownProperties): Frame
 		end
 		return Enum.StudioStyleGuideColor.MainBackground
 	end)
-	
+
 	local itemValue = getState(props.Value, nil)
 	local function onSelectedItem(item)
 		isOpen:set(false)
@@ -83,7 +84,7 @@ return function(props: DropdownProperties): Frame
 			props.OnSelected(item)
 		end
 	end
-	
+
 	--should this reallly be trying to select the
 	--currently selected item? that might conflict with stuff
 	local selectedItem = Computed(function()
@@ -101,16 +102,16 @@ return function(props: DropdownProperties): Frame
 		isEmpty:set(false)
 		return currentItem
 	end)
-	
+
 	local spaceBetweenTopAndDropdown = 5
 	local dropdownPadding = UDim.new(0, 2)
 	local dropdownSize = Computed(function()
 		local propsSize = unwrap(props.Size)
 		return propsSize or UDim2.new(1, 0, 0, dropdownConstants.RowHeight)
 	end)
-	
+
 	local absoluteDropdownSize = Value(UDim2.new())
-	
+
 	local dropdownItems = Computed(function()
 		local itemList = {}
 		local dropdownItemList = unwrap(props.Items)
@@ -128,7 +129,7 @@ return function(props: DropdownProperties): Frame
 		end
 		return itemList
 	end)
-	
+
 	local maxVisibleRows = Computed(function()
 		return unwrap(props.MaxVisibleItems) or dropdownConstants.MaxVisibleRows
 	end)
@@ -141,18 +142,18 @@ return function(props: DropdownProperties): Frame
 			+ (visibleItems - 1) * rowPadding -- row padding
 			+ (dropdownPadding.Offset * 2) -- top and bottom
 	end)
-	
+
 	local zIndex = Computed(function()
 		return unwrap(props.ZIndex) or 5
 	end)
-	
+
 	local newDropdown = New "Frame" {
 		Name = "Dropdown",
 		Size = dropdownSize,
 		Position = UDim2.fromScale(0.5, 0.5),
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		BackgroundTransparency = 1,
-		
+
 		[OnEvent "InputBegan"] = function(inputObject)
 			if not unwrap(isEnabled) then
 				return
@@ -162,6 +163,7 @@ return function(props: DropdownProperties): Frame
 				isOpen:set(not unwrap(isOpen))
 			end
 		end,
+
 		[OnEvent "InputEnded"] = function(inputObject)
 			if not unwrap(isEnabled) then
 				return
@@ -169,10 +171,11 @@ return function(props: DropdownProperties): Frame
 				isHovering:set(false)
 			end
 		end,
+
 		[OnChange "AbsoluteSize"] = function(newAbsoluteSize)
 			absoluteDropdownSize:set(UDim2.fromOffset(newAbsoluteSize.X, newAbsoluteSize.Y))
 		end, 
-		
+
 		[Children] = {
 			-- this frame hides the dropdown if the mouse leaves it
 			-- maybe this should be done with a mouse click instead
@@ -180,6 +183,7 @@ return function(props: DropdownProperties): Frame
 			New "Frame" {
 				Name = "WholeDropdownInput",
 				BackgroundTransparency = 1,
+
 				Size = Computed(function()
 					local topDropdownSize = unwrap(absoluteDropdownSize, false)
 					local dropdownHeight = unwrap(scrollHeight)
@@ -189,7 +193,7 @@ return function(props: DropdownProperties): Frame
 					end
 					return UDim2.new()
 				end),
-				
+
 				[OnEvent "InputEnded"] = function(inputObject)
 					if not unwrap(isOpen) then
 						return
@@ -200,17 +204,17 @@ return function(props: DropdownProperties): Frame
 			},
 			BoxBorder {
 				Color = themeProvider:GetColor(Enum.StudioStyleGuideColor.CheckedFieldBorder, modifier),
-				
+
 				[Children] = New "TextLabel" {
 					Name = "Selected",
 					Size = UDim2.fromScale(1, 1),
-					
-					BackgroundColor3 = getMotionState(themeProvider:GetColor(backgroundStyleGuideColor, modifier), "Spring", 40),
-					Text = selectedItem,
-					Font = themeProvider:GetFont("Default"),
 					TextSize = constants.TextSize,
-					TextColor3 = themeProvider:GetColor(Enum.StudioStyleGuideColor.MainText, modifier),
 					TextXAlignment = Enum.TextXAlignment.Left,
+
+					BackgroundColor3 = getMotionState(themeProvider:GetColor(backgroundStyleGuideColor, modifier), "Spring", 40),
+					TextColor3 = themeProvider:GetColor(Enum.StudioStyleGuideColor.MainText, modifier),
+					Font = themeProvider:GetFont("Default"),
+					Text = selectedItem,
 
 					[Children] = New "UIPadding" {
 						PaddingLeft = UDim.new(0, dropdownConstants.TextPaddingLeft),
@@ -224,7 +228,7 @@ return function(props: DropdownProperties): Frame
 				Position = UDim2.fromScale(1, 0),
 				Size = UDim2.new(0, 18, 1, 0),
 				BackgroundTransparency = 1,
-				
+
 				[Children] = New "ImageLabel" {
 					Name = "Arrow",
 					Image = "rbxassetid://7260137654",
@@ -235,43 +239,44 @@ return function(props: DropdownProperties): Frame
 					ImageColor3 = themeProvider:GetColor(Enum.StudioStyleGuideColor.TitlebarText, modifier),
 				}
 			},
-			Computed(function()
-				if unwrap(isOpen) then
-					return BoxBorder {
-						[Children] = ScrollFrame {
-							ZIndex = zIndex,
-							Name = "Drop",
-							BorderSizePixel = 0,
-							Position = UDim2.new(0, 0, 1, spaceBetweenTopAndDropdown),
-							Size = Computed(function()
-								return UDim2.new(1, 0, 0, unwrap(scrollHeight))
-							end),
-							Layout = New "UIListLayout" {
-								Padding = UDim.new(0, rowPadding),	
-							},
-							UIPadding = New "UIPadding" {
-								PaddingLeft = dropdownPadding,
-								PaddingRight = dropdownPadding,
-								PaddingTop = dropdownPadding,
-								PaddingBottom = dropdownPadding,
-							},
+			--Computed(function()
+			--if unwrap(isOpen) then
+			--[[return]] BoxBorder {
+				[Children] = ScrollFrame {
+					ZIndex = zIndex,
+					Name = "Drop",
+					BorderSizePixel = 0,
+					Visible = isOpen,
+					Position = UDim2.new(0, 0, 1, spaceBetweenTopAndDropdown),
+					Size = Computed(function()
+						return UDim2.new(1, 0, 0, unwrap(scrollHeight))
+					end),
 
-							[Children] = ForValues(dropdownItems, function(props)
-								props.ZIndex = unwrap(zIndex) + 1
-								return DropdownItem(props)
-							end),
-						}
-					}
-				end
-				return nil
-			end)
+					ScrollBarBorderMode = Enum.BorderMode.Outline,
+					CanvasScaleConstraint = Enum.ScrollingDirection.X,
+
+					UILayout = New "UIListLayout" {
+						Padding = UDim.new(0, rowPadding),	
+					},
+
+					UIPadding = New "UIPadding" {
+						PaddingLeft = dropdownPadding,
+						PaddingRight = dropdownPadding,
+						PaddingTop = dropdownPadding,
+						PaddingBottom = dropdownPadding,
+					},
+
+					[Children] = ForValues(dropdownItems, function(props)
+						props.ZIndex = unwrap(zIndex) + 1
+						return DropdownItem(props)
+					end),
+				}
+			}
+			--end
+			--return nil
+			--end)
 		},
 	}
-	
-	local hydrateProps = table.clone(props)
-	for _,propertyIndex in pairs(COMPONENT_ONLY_PROPERTIES) do
-		hydrateProps[propertyIndex] = nil
-	end
-	
-	return Hydrate(newDropdown)(hydrateProps)
+
+	return Hydrate(newDropdown)(stripProps(props, COMPONENT_ONLY_PROPERTIES))
 end
