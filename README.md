@@ -36,7 +36,8 @@ This is a Fusion port of [StudioComponents](https://github.com/sircfenner/Studio
 | [Loading](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/Loading.lua) | An animated component to display whilst something else loads. | Frame |
 | [Dropdown](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/Dropdown/init.lua) | A button that shows the selected item and a list of items in a dropdown when clicking on it. | Frame |
 | [ColorPicker](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/ColorPicker.lua) | An HSV color picker that uses a value slider. | Frame |
-| [ScrollFrame](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/ScrollFrame/init.lua) | A custom scrolling frame that doesn't use Roblox's ScrollingFrame. | Frame |
+| [BaseScrollFrame](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/BaseScrollFrame/init.lua) | A custom scrolling frame that uses Roblox's ScrollingFrame for input and padding. | Frame |
+| [ScrollFrame](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/ScrollFrame.lua) | Same as BaseScrollFrame, but has properties that will determine the CanvasSize for the BaseScrollFrame. | Frame |
 | [Slider](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/Slider.lua) | A slider that reacts to being dragged. | TextButton |
 | [ProgressBar](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/ProgressBar.lua) | A bar that fills up with an accent color. | TextBox |
 | [TextInput](https://github.com/mvyasu/PluginEssentials/blob/main/src/StudioComponents/TextInput.lua) | A TextBox that reacts to states like hover, focus, and disabled. | TextBox |

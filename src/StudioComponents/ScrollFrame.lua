@@ -28,6 +28,8 @@ local COMPONENT_ONLY_PROPERTIES = {
 	"UILayout",
 }
 
+-- if you're using this component with the default sizes of the other components
+-- you'll need to have CanvasScaleConstraint set to Enum.ScrollingDirection.X
 export type ScrollFrameProperties = BaseScrollFrame.BaseScrollFrameProperties & {
 	CanvasScaleConstraint: types.CanBeState<Enum.ScrollingDirection?>?,
 	UIPadding: UIPadding?,
