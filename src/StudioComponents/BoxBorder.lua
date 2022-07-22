@@ -17,8 +17,9 @@ local OnChange = Fusion.OnChange
 local Hydrate = Fusion.Hydrate
 
 type BoxBorderProperties = {
-	Color: (Color3 | types.StateObject<Color3>)?,
-	Thickness: (number | types.StateObject<number>)?,
+	Color: types.CanBeState<Color3>?,
+	Thickness: types.CanBeState<number>?,
+	CornerRadius: types.CanBeState<UDim>?,
 	[types.Children]: GuiObject,
 }
 
@@ -44,7 +45,7 @@ return function(props: BoxBorderProperties): GuiObject
 		hyrdateProps = {
 			[Children] = {
 				New "UICorner" {
-					CornerRadius = constants.CornerRadius
+					CornerRadius = boxProps.CornerRadius or constants.CornerRadius
 				},
 				
 				New "UIStroke" {

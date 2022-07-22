@@ -14,7 +14,6 @@ local themeProvider = require(StudioComponentsUtil.themeProvider)
 local getDragInput = require(StudioComponentsUtil.getDragInput)
 local getModifier = require(StudioComponentsUtil.getModifier)
 local stripProps = require(StudioComponentsUtil.stripProps)
-local constants = require(StudioComponentsUtil.constants)
 local getState = require(StudioComponentsUtil.getState)
 local unwrap = require(StudioComponentsUtil.unwrap)
 local types = require(StudioComponentsUtil.types)
@@ -26,11 +25,13 @@ local OnEvent = Fusion.OnEvent
 local Hydrate = Fusion.Hydrate
 local Cleanup = Fusion.Cleanup
 local Value = Fusion.Value
+local Out = Fusion.Out
 local New = Fusion.New
 local Ref = Fusion.Ref
 
 local COMPONENT_ONLY_PROPERTIES = {
 	"ZIndex",
+	"HandleSize",
 	"OnChange",
 	"Value",
 	"Min",
@@ -39,12 +40,13 @@ local COMPONENT_ONLY_PROPERTIES = {
 	"Enabled",
 }
 
-type numberInput = (number | types.StateObject<number>)?
+type numberInput = types.CanBeState<number>?
 
 type SliderProperties = {
-	Enabled: (boolean | types.StateObject<boolean>)?,
+	HandleSize: types.CanBeState<UDim2>?,
+	Enabled: types.CanBeState<boolean>?,
 	OnChange: ((newValue: number) -> nil)?,
-	Value: (number | types.Value<number>)?,
+	Value: types.CanBeState<number>?,
 	Min: numberInput,
 	Max: numberInput,
 	Step: numberInput,
@@ -54,6 +56,8 @@ type SliderProperties = {
 return function(props: SliderProperties): TextButton
 	local isEnabled = getState(props.Enabled, true)
 	local isHovering = Value(false)
+	
+	local handleSize = props.HandleOffsetSize or UDim2.new(0, 12, 1, -2)
 
 	local handleRegion = Value()
 	local inputValue = getState(props.Value, 1)
@@ -106,7 +110,8 @@ return function(props: SliderProperties): TextButton
 
 	local handleFill = themeProvider:GetColor(Enum.StudioStyleGuideColor.Button)
 	local handleBorder = themeProvider:GetColor(Enum.StudioStyleGuideColor.InputFieldBorder, handleModifier)
-
+	local barAbsSize = Value(Vector2.zero)
+	
 	local newSlider = New "Frame" {
 		Name = "Slider",
 		Size = UDim2.new(1, 0, 0, 22),
@@ -117,14 +122,21 @@ return function(props: SliderProperties): TextButton
 		[Children] = {
 			BoxBorder {
 				Color = themeProvider:GetColor(Enum.StudioStyleGuideColor.InputFieldBorder),
-
+				CornerRadius = UDim.new(0, 1),
+				
 				[Children] = New "Frame" {
 					Name = "Bar",
 					ZIndex = zIndex,
-					Size = UDim2.new(1, 0, 0, 3),
-					Position = UDim2.fromScale(0, 0.5),
-					AnchorPoint = Vector2.new(0, 0.5),
+					Position = UDim2.fromScale(.5, .5),
+					AnchorPoint = Vector2.new(.5, .5),
 					BorderSizePixel = 0,
+					
+					[Out "AbsoluteSize"] = barAbsSize,
+					
+					Size = Computed(function()
+						local handleSize = unwrap(handleSize) or UDim2.new()
+						return UDim2.new(1, -handleSize.X.Offset, 0, 5)
+					end),
 
 					BackgroundColor3 = getMotionState(themeProvider:GetColor(Enum.StudioStyleGuideColor.InputFieldBackground, mainModifier), "Spring", 40),
 
@@ -147,14 +159,21 @@ return function(props: SliderProperties): TextButton
 
 					[Children] = New "Frame" {
 						Name = "Handle",
-						AnchorPoint = Vector2.new(0.5, 0.5),
-						Size = UDim2.new(0, 10, 0, constants.TextSize*1.3),
 						BorderMode = Enum.BorderMode.Inset,
 						BackgroundColor3 = handleFill,
 						BorderSizePixel = 0,
+						
+						Size = handleSize,
+						
+						AnchorPoint = Vector2.new(.5, .5),
 
 						Position = getMotionState(Computed(function()
-							return UDim2.fromScale(unwrap(currentAlpha).X, 0.5)
+							local handleSize = unwrap(handleSize) or UDim2.new()
+							local absoluteBarSize = unwrap(barAbsSize) or Vector2.zero
+							return UDim2.new(
+								0, (unwrap(currentAlpha).X*absoluteBarSize.X) + handleSize.X.Offset/2,
+								.5, 0
+							)
 						end), "Spring", 40),
 
 						[OnEvent "InputBegan"] = function(inputObject)
@@ -164,6 +183,7 @@ return function(props: SliderProperties): TextButton
 								isHovering:set(true)
 							end
 						end,
+						
 						[OnEvent "InputEnded"] = function(inputObject)
 							if not unwrap(isEnabled) then
 								return
