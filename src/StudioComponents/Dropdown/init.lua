@@ -11,6 +11,7 @@ local ScrollFrame = require(StudioComponents.ScrollFrame)
 local BoxBorder = require(StudioComponents.BoxBorder)
 local DropdownItem = require(script.DropdownItem)
 
+local getSelectedState = require(StudioComponentsUtil.getSelectedState)
 local getMotionState = require(StudioComponentsUtil.getMotionState)
 local themeProvider = require(StudioComponentsUtil.themeProvider)
 local getModifier = require(StudioComponentsUtil.getModifier)
@@ -26,6 +27,8 @@ local ForValues = Fusion.ForValues
 local Computed = Fusion.Computed
 local Children = Fusion.Children
 local OnChange = Fusion.OnChange
+local Observer = Fusion.Observer
+local Cleanup = Fusion.Cleanup
 local OnEvent = Fusion.OnEvent
 local Hydrate = Fusion.Hydrate
 local Value = Fusion.Value
@@ -34,7 +37,7 @@ local New = Fusion.New
 local COMPONENT_ONLY_PROPERTIES = {
 	"Enabled",
 	"MaxVisibleItems",
-	"Items",
+	"Options",
 	"Value",
 	"ZIndex",
 	"OnSelected",
@@ -43,10 +46,10 @@ local COMPONENT_ONLY_PROPERTIES = {
 
 type DropdownProperties = {
 	Enabled: (boolean | types.StateObject<boolean>)?,
-	Value: (string | types.Value<string>)?,
-	Items: {string} | types.StateObject<{string}>,
+	Value: (any | types.Value<any>)?,
+	Options: {any} | types.StateObject<{any}>,
 	MaxVisibleItems: (number | types.StateObject<number>)?,
-	OnSelected: (newItem: string) -> nil,
+	OnSelected: (selectedOption: any) -> nil,
 	[any]: any,
 }
 
@@ -54,7 +57,10 @@ return function(props: DropdownProperties): Frame
 	local isInputEnabled = getState(props.Enabled, true)
 	local isHovering = Value(false)
 	local isOpen = Value(false)
-	local isEmpty = Value(false)
+	
+	local isEmpty = Computed(function()
+		return next(unwrap(props.Options or {}))==nil
+	end)
 
 	local isEnabled = Computed(function()
 		local isInputEnabled = unwrap(isInputEnabled)
@@ -75,33 +81,27 @@ return function(props: DropdownProperties): Frame
 		end
 		return Enum.StudioStyleGuideColor.MainBackground
 	end)
-
-	local itemValue = getState(props.Value, nil)
-	local function onSelectedItem(item)
-		isOpen:set(false)
-		itemValue:set(item)
-		if props.OnSelected then
-			props.OnSelected(item)
-		end
-	end
-
-	--should this reallly be trying to select the
-	--currently selected item? that might conflict with stuff
-	local selectedItem = Computed(function()
-		local dropdownItemList = unwrap(props.Items)
-		local currentItem = unwrap(itemValue)
-		if currentItem==nil then
-			local _,nextItem = next(dropdownItemList)
-			if nextItem~=nil then
-				onSelectedItem(nextItem)
-				return nextItem
+	
+	local disconnectGetSelectedState = nil
+	local selectedOption, onSelectedOption do
+		local inputValue = getState(props.Value, nil, "Value")
+		onSelectedOption = function(selectedOption)
+			isOpen:set(false)
+			inputValue:set(selectedOption)
+			if props.OnSelected then
+				props.OnSelected(selectedOption)
 			end
-			isEmpty:set(true)
-			return "Empty"
 		end
-		isEmpty:set(false)
-		return currentItem
-	end)
+		
+		selectedOption = Computed(getSelectedState {
+			Value = inputValue,
+			Options = props.Options,
+			OnSelected = onSelectedOption,
+		})
+		--just in case there's never a dependency for selectedOption
+		--props.OnSelected should always be ran even if there isn't a dependency
+		disconnectGetSelectedState = Observer(selectedOption):onChange(function() end)
+	end
 
 	local spaceBetweenTopAndDropdown = 5
 	local dropdownPadding = UDim.new(0, 2)
@@ -114,11 +114,11 @@ return function(props: DropdownProperties): Frame
 
 	local dropdownItems = Computed(function()
 		local itemList = {}
-		local dropdownItemList = unwrap(props.Items)
+		local dropdownOptionList = unwrap(props.Options)
 		if unwrap(isOpen) then
-			for i, item in ipairs(dropdownItemList) do
+			for i, item in ipairs(dropdownOptionList) do
 				itemList[i] = {
-					OnSelected = onSelectedItem,
+					OnSelected = onSelectedOption,
 					Size = Computed(function()
 						return UDim2.new(1, 0, 0, unwrap(absoluteDropdownSize).Y.Offset)
 					end),
@@ -146,6 +146,16 @@ return function(props: DropdownProperties): Frame
 	local zIndex = Computed(function()
 		return unwrap(props.ZIndex) or 5
 	end)
+	
+	local function getOptionName(option)
+		local option = unwrap(option)
+		if typeof(option)=="table" and (option.Label or option.Name or option.Title) then
+			return tostring(option.Label or option.Name or option.Title)
+		elseif typeof(option)=="Instance" or typeof(option)=="EnumItem" then
+			return option.Name
+		end
+		return tostring(option)
+	end
 
 	local newDropdown = New "Frame" {
 		Name = "Dropdown",
@@ -153,6 +163,8 @@ return function(props: DropdownProperties): Frame
 		Position = UDim2.fromScale(0.5, 0.5),
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		BackgroundTransparency = 1,
+		
+		[Cleanup] = disconnectGetSelectedState,
 
 		[OnEvent "InputBegan"] = function(inputObject)
 			if not unwrap(isEnabled) then
@@ -214,7 +226,9 @@ return function(props: DropdownProperties): Frame
 					BackgroundColor3 = getMotionState(themeProvider:GetColor(backgroundStyleGuideColor, modifier), "Spring", 40),
 					TextColor3 = themeProvider:GetColor(Enum.StudioStyleGuideColor.MainText, modifier),
 					Font = themeProvider:GetFont("Default"),
-					Text = selectedItem,
+					Text = Computed(function()
+						return getOptionName(selectedOption)
+					end),
 
 					[Children] = New "UIPadding" {
 						PaddingLeft = UDim.new(0, dropdownConstants.TextPaddingLeft),
@@ -268,6 +282,7 @@ return function(props: DropdownProperties): Frame
 
 					[Children] = ForValues(dropdownItems, function(props)
 						props.ZIndex = unwrap(zIndex) + 1
+						props.Text = getOptionName(props.Item) 
 						return DropdownItem(props)
 					end),
 				}

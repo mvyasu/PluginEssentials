@@ -26,8 +26,8 @@ local COMPONENT_ONLY_PROPERTIES = {
 }
 
 type DropdownItemProperties = {
-	OnSelected: ((item: string) -> nil),
-	Item: string,
+	OnSelected: ((selectedOption: any) -> nil),
+	Item: any,
 	[any]: any,
 }
 
@@ -47,7 +47,7 @@ return function(props: DropdownItemProperties): TextButton
 		BackgroundColor3 = themeProvider:GetColor(Enum.StudioStyleGuideColor.EmulatorBar, modifier),
 		BorderSizePixel = 0,
 		Font = themeProvider:GetFont("Default"),
-		Text = props.Item,
+		Text = tostring(props.Item),
 		TextSize = constants.TextSize,
 		TextColor3 = themeProvider:GetColor(Enum.StudioStyleGuideColor.MainText, modifier),
 		TextXAlignment = Enum.TextXAlignment.Left,
