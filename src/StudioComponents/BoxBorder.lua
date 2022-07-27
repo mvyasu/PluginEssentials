@@ -29,7 +29,7 @@ return function(props: BoxBorderProperties): GuiObject
 	local boxProps = props or {}
 	local borderColor = boxProps.Color or themeProvider:GetColor(Enum.StudioStyleGuideColor.Border)
 	
-	local hyrdateProps = {
+	local hydrateProps = {
 		BorderColor3 = borderColor,
 		BorderMode = Enum.BorderMode.Inset,
 		BorderSizePixel = Computed(function()
@@ -42,7 +42,7 @@ return function(props: BoxBorderProperties): GuiObject
 	if unwrap(constants.CurvedBoxes) then
 		local backgroundTransparency = Value(props[Children].BackgroundTransparency)
 		
-		hyrdateProps = {
+		hydrateProps = {
 			[Children] = {
 				New "UICorner" {
 					CornerRadius = boxProps.CornerRadius or constants.CornerRadius
@@ -62,5 +62,5 @@ return function(props: BoxBorderProperties): GuiObject
 		}
 	end
 	
-	return Hydrate(props[Children])(hyrdateProps)
+	return Hydrate(props[Children])(hydrateProps)
 end
