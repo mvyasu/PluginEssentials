@@ -80,8 +80,9 @@ return function(props: BaseScrollFrameProperties): Frame
 		barVisibility.Horizontal:set(math.round(windowSize.X) < math.round(canvasSize.X))
 	end
 
+	local zIndex = props.ZIndex or 1
 	local childZIndex = Computed(function()
-		return unwrap(props.ZIndex) + 10
+		return unwrap(zIndex) + 10
 	end)
 
 	local containerFrame = Background {
@@ -131,7 +132,7 @@ return function(props: BaseScrollFrameProperties): Frame
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
 				
-				ZIndex = props.ZIndex or 1,
+				ZIndex = zIndex,
 				
 				CanvasSize = props.CanvasSize,
 
