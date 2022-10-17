@@ -197,6 +197,5 @@ return function(props: SliderProperties): TextButton
 		}
 	}
 
-	local hydrateProps = stripProps(props, COMPONENT_ONLY_PROPERTIES)
-	return Hydrate(newSlider)(hydrateProps)
+	return Hydrate(newSlider)(stripProps(props, COMPONENT_ONLY_PROPERTIES))
 end
