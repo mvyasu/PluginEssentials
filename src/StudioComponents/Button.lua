@@ -20,6 +20,5 @@ return function(props: ButtonProperties): TextButton
 		props.Name = "Button"
 	end
 
-	local newButton = BaseButton(props)
-	return newButton
+	return BaseButton(props)
 end
