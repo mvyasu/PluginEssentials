@@ -108,6 +108,5 @@ return function(props: IconButtonProperties): TextButton
 		}
 	}
 
-	local hydrateProps = stripProps(props, COMPONENT_ONLY_PROPERTIES)
-	return Hydrate(newBaseButton)(hydrateProps)
+	return Hydrate(newBaseButton)(stripProps(props, COMPONENT_ONLY_PROPERTIES))
 end
