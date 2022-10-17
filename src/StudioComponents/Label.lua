@@ -56,6 +56,5 @@ return function(props: LabelProperties): TextLabel
 		BorderMode = Enum.BorderMode.Inset,
 	}
 
-	local hydrateProps = stripProps(props, COMPONENT_ONLY_PROPERTIES)
-	return Hydrate(newLabel)(hydrateProps)
+	return Hydrate(newLabel)(stripProps(props, COMPONENT_ONLY_PROPERTIES))
 end
