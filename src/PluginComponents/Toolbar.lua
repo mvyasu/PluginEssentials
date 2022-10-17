@@ -1,6 +1,12 @@
 local Plugin = script:FindFirstAncestorWhichIsA("Plugin")
 local Fusion = require(Plugin:FindFirstChild("Fusion", true))
 
+local PluginComponents = script.Parent
+local StudioComponents = PluginComponents.Parent.StudioComponents
+local StudioComponentsUtil = StudioComponents:FindFirstChild("Util")
+
+local stripProps = require(StudioComponentsUtil.stripProps)
+
 local Hydrate = Fusion.Hydrate
 
 local COMPONENT_ONLY_PROPERTIES = {
@@ -15,10 +21,5 @@ type ToolbarProperties = {
 return function(props: ToolbarProperties): PluginToolbar
 	local newToolbar = Plugin:CreateToolbar(props.Name)
 
-	local hydrateProps = table.clone(props)
-	for _,propertyName in pairs(COMPONENT_ONLY_PROPERTIES) do
-		hydrateProps[propertyName] = nil
-	end
-
-	return Hydrate(newToolbar)(hydrateProps)
+	return Hydrate(newToolbar)(stripProps(props, COMPONENT_ONLY_PROPERTIES))
 end
