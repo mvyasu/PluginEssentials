@@ -12,6 +12,7 @@ local BoxBorder = require(StudioComponents.BoxBorder)
 local getMotionState = require(StudioComponentsUtil.getMotionState)
 local themeProvider = require(StudioComponentsUtil.themeProvider)
 local getModifier = require(StudioComponentsUtil.getModifier)
+local stripProps = require(StudioComponentsUtil.stripProps)
 local constants = require(StudioComponentsUtil.constants)
 local getState = require(StudioComponentsUtil.getState)
 local unwrap = require(StudioComponentsUtil.unwrap)
@@ -181,10 +182,5 @@ return function(props: CheckboxProperties): Frame
 		}
 	}
 
-	local hydrateProps = table.clone(props)
-	for _,propertyIndex in pairs(COMPONENT_ONLY_PROPERTIES) do
-		hydrateProps[propertyIndex] = nil
-	end
-
-	return Hydrate(newCheckboxFrame)(hydrateProps)
+	return Hydrate(newCheckboxFrame)(stripProps(props, COMPONENT_ONLY_PROPERTIES))
 end
