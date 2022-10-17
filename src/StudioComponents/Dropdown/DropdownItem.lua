@@ -6,6 +6,7 @@ local StudioComponentsUtil = StudioComponents:FindFirstChild("Util")
 
 local themeProvider = require(StudioComponentsUtil.themeProvider)
 local getModifier = require(StudioComponentsUtil.getModifier)
+local stripProps = require(StudioComponentsUtil.stripProps)
 local constants = require(StudioComponentsUtil.constants)
 local getState = require(StudioComponentsUtil.getState)
 local unwrap = require(StudioComponentsUtil.unwrap)
@@ -86,10 +87,5 @@ return function(props: DropdownItemProperties): TextButton
 		}
 	}
 	
-	local hydrateProps = table.clone(props)
-	for _,propertyIndex in pairs(COMPONENT_ONLY_PROPERTIES) do
-		hydrateProps[propertyIndex] = nil
-	end
-	
-	return Hydrate(newDropdownItem)(hydrateProps)
+	return Hydrate(newDropdownItem)(stripProps(props, COMPONENT_ONLY_PROPERTIES))
 end
