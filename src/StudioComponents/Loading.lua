@@ -137,7 +137,6 @@ return function(props: LoadingProperties): Frame
 			},
 		}
 	}
-
-	local hydrateProps = stripProps(props, COMPONENT_ONLY_PROPERTIES)
-	return Hydrate(frame)(hydrateProps)
+	
+	return Hydrate(frame)(stripProps(props, COMPONENT_ONLY_PROPERTIES))
 end
