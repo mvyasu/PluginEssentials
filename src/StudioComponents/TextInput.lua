@@ -115,6 +115,5 @@ return function(props: TextInputProperties): TextLabel
 		}
 	}
 
-	local hydrateProps = stripProps(props, COMPONENT_ONLY_PROPERTIES)
-	return Hydrate(newTextBox)(hydrateProps)
+	return Hydrate(newTextBox)(stripProps(props, COMPONENT_ONLY_PROPERTIES))
 end
