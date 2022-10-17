@@ -5,6 +5,7 @@ local PluginComponents = script.Parent
 local StudioComponents = PluginComponents.Parent:FindFirstChild("StudioComponents")
 local StudioComponentsUtil = StudioComponents:FindFirstChild("Util")
 
+local stripProps = require(StudioComponentsUtil.stripProps)
 local unwrap = require(StudioComponentsUtil.unwrap)
 local types = require(StudioComponentsUtil.types)
 
@@ -44,10 +45,5 @@ return function(props: ToolbarProperties)
 		end
 	end
 
-	local hydrateProps = table.clone(props)
-	for _,propertyName in pairs(COMPONENT_ONLY_PROPERTIES) do
-		hydrateProps[propertyName] = nil
-	end
-
-	return Hydrate(toolbarButton)(hydrateProps)
+	return Hydrate(toolbarButton)(stripProps(props, COMPONENT_ONLY_PROPERTIES))
 end
