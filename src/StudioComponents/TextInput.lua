@@ -24,6 +24,7 @@ local Children = Fusion.Children
 local Hydrate = Fusion.Hydrate
 local OnEvent = Fusion.OnEvent
 local Value = Fusion.Value
+local Out = Fusion.Out
 local New = Fusion.New
 
 local PLACEHOLDER_TEXT_COLOR = Color3.fromRGB(102, 102, 102)
@@ -53,8 +54,8 @@ return function(props: TextInputProperties): TextLabel
 		Hovering = isHovering,
 	})
 
-	local currentTextBounds = Value(Vector2.new())
-	local absoluteTextBoxSize = Value(Vector2.new())
+	local currentTextBounds = Value(Vector2.zero)
+	local absoluteTextBoxSize = Value(Vector2.zero)
 
 	local newTextBox = BoxBorder {
 		Color = getMotionState(themeProvider:GetColor(Enum.StudioStyleGuideColor.InputFieldBorder, borderModifier), "Spring", 40),
@@ -62,31 +63,34 @@ return function(props: TextInputProperties): TextLabel
 		[Children] = New "TextBox" {
 			Name = "TextInput",
 			Size = UDim2.new(1, 0, 0, 25),
-			BackgroundColor3 = getMotionState(themeProvider:GetColor(Enum.StudioStyleGuideColor.InputFieldBackground, mainModifier), "Spring", 40),
-			Font = themeProvider:GetFont("Default"),
 			Text = "",
 			TextSize = constants.TextSize,
-			TextColor3 = getMotionState(themeProvider:GetColor(Enum.StudioStyleGuideColor.MainText, mainModifier), "Spring", 40),
 			PlaceholderColor3 = PLACEHOLDER_TEXT_COLOR,
+			ClipsDescendants = true,
+
+			Font = themeProvider:GetFont("Default"),
+			BackgroundColor3 = getMotionState(themeProvider:GetColor(Enum.StudioStyleGuideColor.InputFieldBackground, mainModifier), "Spring", 40),
+			TextColor3 = getMotionState(themeProvider:GetColor(Enum.StudioStyleGuideColor.MainText, mainModifier), "Spring", 40),
+			TextEditable = isEnabled,
+
 			TextXAlignment = Computed(function()
-				local bounds = unwrap(currentTextBounds).X + 5 -- because of padding
-				local pixels = unwrap(absoluteTextBoxSize).X
+				local bounds = (unwrap(currentTextBounds) or Vector2.zero).X + 5 -- because of padding
+				local pixels = (unwrap(absoluteTextBoxSize) or Vector2.zero).X
 				return if bounds >= pixels then Enum.TextXAlignment.Right else Enum.TextXAlignment.Left
 			end),
-			TextEditable = isEnabled,
-			ClipsDescendants = true,
+
 			ClearTextOnFocus = Computed(function()
 				local clearTextOnFocus = (unwrap(props.ClearTextOnFocus) or false)
 				local isEnabled = unwrap(isEnabled)
 				return clearTextOnFocus and isEnabled
 			end),
 
-			[OnChange "TextBounds"] = function(newTextBounds)
-				currentTextBounds:set(newTextBounds)
-			end,
-			[OnChange "AbsoluteSize"] = function(newAbsoluteSize)
-				absoluteTextBoxSize:set(newAbsoluteSize)
-			end,
+			[Out "TextBounds"] = currentTextBounds,
+			[Out "AbsoluteSize"] = absoluteTextBoxSize,
+
+			[OnEvent "Focused"] = function() isFocused:set(true) end,
+			[OnEvent "FocusLost"] = function() isFocused:set(false) end,
+
 			[OnEvent "InputBegan"] = function(inputObject)
 				if not unwrap(isEnabled) then
 					return
@@ -94,18 +98,13 @@ return function(props: TextInputProperties): TextLabel
 					isHovering:set(true)
 				end
 			end,
+			
 			[OnEvent "InputEnded"] = function(inputObject)
 				if not unwrap(isEnabled) then
 					return
 				elseif inputObject.UserInputType == Enum.UserInputType.MouseMovement then
 					isHovering:set(false)
 				end
-			end,
-			[OnEvent "Focused"] = function()
-				isFocused:set(true)
-			end,
-			[OnEvent "FocusLost"] = function()
-				isFocused:set(false)
 			end,
 
 			[Children] = New "UIPadding" {

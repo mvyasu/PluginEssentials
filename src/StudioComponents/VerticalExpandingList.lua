@@ -58,9 +58,11 @@ return function(props: VerticalExpandingListProperties): Frame
 				[Children] = New "UIListLayout" {
 					SortOrder = Enum.SortOrder.LayoutOrder,
 					FillDirection = Enum.FillDirection.Vertical,
+
 					Padding = Computed(function()
 						return unwrap(props.Padding) or UDim.new(0, 10)
 					end),
+
 					[Out "AbsoluteContentSize"] = contentSize,
 				}
 			}

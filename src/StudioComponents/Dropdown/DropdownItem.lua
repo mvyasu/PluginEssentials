@@ -82,7 +82,7 @@ return function(props: DropdownItemProperties): TextButton
 						CornerRadius = constants.CornerRadius
 					}
 				end
-			end)
+			end, Fusion.cleanup)
 		}
 	}
 	

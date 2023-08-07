@@ -44,16 +44,18 @@ return function(props: LabelProperties): TextLabel
 		Name = "Label",
 		Position = UDim2.fromScale(0, 0),
 		AnchorPoint = Vector2.new(0, 0),
-		Size = Computed(function()
-			return UDim2.new(1, 0, 0, unwrap(textSize))
-		end),
 		Text = "Label",
-		Font = themeProvider:GetFont("Default"),
-		TextColor3 = props.TextColor3 or getMotionState(themeProvider:GetColor(props.TextColorStyle or Enum.StudioStyleGuideColor.MainText, mainModifier), "Spring", 40),
 		TextSize = textSize,
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		BorderMode = Enum.BorderMode.Inset,
+
+		Font = themeProvider:GetFont("Default"),
+		TextColor3 = props.TextColor3 or getMotionState(themeProvider:GetColor(props.TextColorStyle or Enum.StudioStyleGuideColor.MainText, mainModifier), "Spring", 40),
+
+		Size = Computed(function()
+			return UDim2.new(1, 0, 0, unwrap(textSize))
+		end),
 	}
 
 	local hydrateProps = stripProps(props, COMPONENT_ONLY_PROPERTIES)

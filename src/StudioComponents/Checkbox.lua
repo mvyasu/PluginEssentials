@@ -133,17 +133,19 @@ return function(props: CheckboxProperties): Frame
 						Size = UDim2.fromOffset(13, 13),
 						Position = UDim2.fromScale(.5, .5),
 						Image = INDICATOR_IMAGE,
+						ImageRectSize = Vector2.new(13, 13),
+
 						ImageColor3 = getMotionState(Computed(function()
 							local indicatorColor = unwrap(checkFieldIndicatorColor)
 							return if unwrap(isIndeterminate) then Color3.fromRGB(255, 255, 255) else indicatorColor
 						end), "Spring", 40),
+						
 						ImageRectOffset = Computed(function()
 							if unwrap(isIndeterminate) then
 								return if unwrap(themeProvider.IsDark) then Vector2.new(13, 0) else Vector2.new(26, 0)
 							end
 							return Vector2.new(0, 0)
 						end),
-						ImageRectSize = Vector2.new(13, 13),
 
 						[Children] = Computed(function()
 							local useCurvedBoxes = unwrap(constants.CurvedBoxes)
@@ -152,7 +154,7 @@ return function(props: CheckboxProperties): Frame
 									CornerRadius = constants.CornerRadius
 								}
 							end
-						end)
+						end, Fusion.cleanup)
 					}
 				}
 			},
@@ -177,7 +179,7 @@ return function(props: CheckboxProperties): Frame
 						TextColor3 = themeProvider:GetColor(Enum.StudioStyleGuideColor.MainText, mainModifier),
 					}
 				end
-			end)
+			end, Fusion.cleanup)
 		}
 	}
 

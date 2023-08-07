@@ -284,7 +284,7 @@ return function(props: DropdownProperties): Frame
 						props.ZIndex = unwrap(zIndex) + 1
 						props.Text = getOptionName(props.Item) 
 						return DropdownItem(props)
-					end),
+					end, Fusion.cleanup),
 				}
 			}
 			--end

@@ -37,21 +37,23 @@ return function(props: LabelProperties): TextLabel
 		Name = "Label",
 		Position = UDim2.fromScale(0, 0),
 		AnchorPoint = Vector2.new(0, 0),
+		Text = "Label",
+		Font = themeProvider:GetFont("Bold"),
+		TextSize = textSize,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		BorderMode = Enum.BorderMode.Inset,
+
 		Size = Computed(function()
 			return UDim2.new(1, 0, 0, unwrap(textSize))
 		end),
-		Text = "Label",
-		Font = themeProvider:GetFont("Bold"),
+
 		TextColor3 = props.TextColor3 or themeProvider:GetColor(props.TextColorStyle or Enum.StudioStyleGuideColor.MainText, Computed(function()
 			if not unwrap(isEnabled) then
 				return Enum.StudioStyleGuideModifier.Disabled
 			end
 			return Enum.StudioStyleGuideModifier.Default
 		end)),
-		TextSize = textSize,
-		BackgroundTransparency = 1,
-		BorderSizePixel = 0,
-		BorderMode = Enum.BorderMode.Inset,
 	}
 
 	local hydrateProps = stripProps(props, COMPONENT_ONLY_PROPERTIES)

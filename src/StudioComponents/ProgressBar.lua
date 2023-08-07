@@ -41,14 +41,13 @@ return function(props: ProgressProperties): Frame
 			New "Frame" {
 				Name = "Fill",
 				BackgroundColor3 = themeProvider:GetColor(Enum.StudioStyleGuideColor.DialogMainButton),
+				
 				Size = getMotionState(Computed(function()
 					return UDim2.fromScale(unwrap(props.Progress), 1)
 				end), "Spring", 40),
 
-				[Children] = {
-					New "UICorner" {
-						CornerRadius = constants.CornerRadius,
-					},
+				[Children] = New "UICorner" {
+					CornerRadius = constants.CornerRadius,
 				}
 			},
 		}

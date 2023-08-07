@@ -76,10 +76,11 @@ return function(props: VerticalExpandingListProperties): Frame
 		BackgroundTransparency = 1,
 		--TODO: remove this +2 once BorderMode becomes a thing for UIStroke
 		Size = UDim2.new(1, 0, 0, HEADER_HEIGHT+2),
+		Padding = props.Padding,
+
 		AutomaticSize = Computed(function()
 			return isCollapsed:get() and Enum.AutomaticSize.None or Enum.AutomaticSize.Y
 		end),
-		Padding = props.Padding,
 
 		[Children] = {
 			--TODO: remove this UIPadding and Frame once BorderMode becomes a thing for UIStroke
@@ -106,6 +107,7 @@ return function(props: VerticalExpandingListProperties): Frame
 					LayoutOrder = 0,
 					Active = true,
 					Size = UDim2.new(1, 0, 0, HEADER_HEIGHT),
+
 					BackgroundColor3 = getMotionState(themeProvider:GetColor(Enum.StudioStyleGuideColor.HeaderSection, modifier), "Spring", 40),
 
 					[OnEvent "InputBegan"] = function(inputObject)
@@ -117,6 +119,7 @@ return function(props: VerticalExpandingListProperties): Frame
 							shouldBeCollapsed:set(not shouldBeCollapsed:get())
 						end
 					end,
+
 					[OnEvent "InputEnded"] = function(inputObject)
 						if not unwrap(isEnabled) then
 							return
@@ -132,6 +135,9 @@ return function(props: VerticalExpandingListProperties): Frame
 							Position = UDim2.new(0, 7, 0.5, 0),
 							Size = UDim2.fromOffset(10, 10),
 							Image = "rbxassetid://5607705156",
+							ImageRectSize = Vector2.new(10, 10),
+							BackgroundTransparency = 1,
+
 							ImageColor3 = getMotionState(Computed(function()
 								local baseColor = Color3.fromRGB(170, 170, 170)
 								if unwrap(isEnabled) then
@@ -140,13 +146,19 @@ return function(props: VerticalExpandingListProperties): Frame
 								local h, s, v = baseColor:ToHSV()
 								return Color3.fromHSV(h, s, math.clamp(v - .2, 0, 1))
 							end), "Spring", 40),
+
 							ImageRectOffset = Computed(function()
 								return Vector2.new(unwrap(isCollapsed) and 0 or 10, 0)
 							end),
-							ImageRectSize = Vector2.new(10, 10),
-							BackgroundTransparency = 1,
 						},
 						Label {
+							TextXAlignment = Enum.TextXAlignment.Left,
+							Size = UDim2.fromScale(1, 1),
+
+							Font = themeProvider:GetFont("Bold"),
+							Text = props.Text or "HeaderText",
+							TextSize = constants.TextSize,
+
 							TextColor3 = getMotionState(Computed(function()
 								local currentLabelColor = unwrap(props.TextColor3 or labelColor)
 								local themeModifier = unwrap(themeColorModifier)
@@ -156,11 +168,7 @@ return function(props: VerticalExpandingListProperties): Frame
 								local h, s, v = currentLabelColor:ToHSV()
 								return Color3.fromHSV(h, s, math.clamp(v + .3 * themeModifier, 0, 1))
 							end), "Spring", 40),
-							TextXAlignment = Enum.TextXAlignment.Left,
-							Font = themeProvider:GetFont("Bold"),
-							TextSize = constants.TextSize,
-							Text = props.Text or "HeaderText",
-							Size = UDim2.fromScale(1, 1),
+
 							[Children] = New "UIPadding" {
 								PaddingLeft = UDim.new(0, 24),
 							}

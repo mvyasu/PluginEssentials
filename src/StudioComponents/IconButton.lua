@@ -72,6 +72,7 @@ return function(props: IconButtonProperties): TextButton
 					isPressed:set(true)
 				end
 			end,
+
 			[OnEvent "InputEnded"] = function(inputObject)
 				if not unwrap(isEnabled) then
 					return
@@ -81,6 +82,7 @@ return function(props: IconButtonProperties): TextButton
 					isPressed:set(false)
 				end
 			end,
+			
 			[OnEvent "Activated"] = (function()
 				if props.Activated then
 					return function()
@@ -91,6 +93,7 @@ return function(props: IconButtonProperties): TextButton
 						end
 					end
 				end
+				return nil
 			end)(),
 
 			[Children] = {
