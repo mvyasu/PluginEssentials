@@ -244,6 +244,23 @@ do --creates the example plugin
 				}
 			},
 			VerticalCollapsibleSection {
+				Text = "Nested Dropdown",
+				Enabled = true,
+				[Children] = {
+					Dropdown {
+						Options = Enum.PartType:GetEnumItems(),
+						MaxVisibleItems = 2,
+						OnSelected = function(optionSelected)
+							print("Selected:", optionSelected)
+						end
+					},
+					Checkbox {
+						Value = false,
+						Text = "Test Checkbox"
+					}
+				}
+			},
+			VerticalCollapsibleSection {
 				Text = "Checkbox Component",
 				[Children] = {
 					Checkbox {
