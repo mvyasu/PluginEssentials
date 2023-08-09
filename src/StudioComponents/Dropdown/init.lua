@@ -41,6 +41,7 @@ local COMPONENT_ONLY_PROPERTIES = {
 	"Value",
 	"ZIndex",
 	"OnSelected",
+	"HideDropdownWhenMouseLeaves",
 	"Size",
 }
 
