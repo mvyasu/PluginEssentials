@@ -45,10 +45,11 @@ local COMPONENT_ONLY_PROPERTIES = {
 }
 
 type DropdownProperties = {
-	Enabled: (boolean | types.StateObject<boolean>)?,
-	Value: (any | types.Value<any>)?,
-	Options: {any} | types.StateObject<{any}>,
-	MaxVisibleItems: (number | types.StateObject<number>)?,
+	Enabled: types.CanBeState<boolean>?,
+	Value: types.CanBeState<any>?,
+	Options: types.CanBeState<{any}>,
+	MaxVisibleItems: types.CanBeState<number>?,
+	HideDropdownWhenMouseLeaves: types.CanBeState<boolean>?,
 	OnSelected: (selectedOption: any) -> nil,
 	[any]: any,
 }
@@ -317,6 +318,9 @@ return function(props: DropdownProperties): Frame
 					if not unwrap(isOpen) then
 						return
 					elseif inputObject.UserInputType == Enum.UserInputType.MouseMovement then
+						if not unwrap(props.HideDropdownWhenMouseLeaves) then
+							return
+						end
 						isOpen:set(false)
 					end
 				end,
