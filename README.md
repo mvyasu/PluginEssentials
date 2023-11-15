@@ -11,8 +11,8 @@ There's no documentation at the moment, but each component has a property type t
 
 The usage of this library can be found in a few projects by the developer community. Here are a few plugins that use this library in some shape or form:
 
+- [Benchmarker](https://devforum.roblox.com/t/benchmarker-plugin-compare-function-speeds-with-graphs-percentiles-and-more/829912) by @boatbomber
 - [LampLight](https://devforum.roblox.com/t/lamplight-global-illumination-for-roblox-new-v12/1837877) by @MrChickenRocket
-- [BenchMarker](https://devforum.roblox.com/t/benchmarker-plugin-compare-function-speeds-with-graphs-percentiles-and-more/829912) by @boatbomber
 - [MeshVox](https://devforum.roblox.com/t/meshvox-v10-a-powerful-3d-smooth-terrain-importstamping-tool/2576245) by @tyridge77
 
 ## PluginComponents
