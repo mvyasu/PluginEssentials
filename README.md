@@ -7,6 +7,14 @@ This is a repository with components that I find essential to making plugins wit
 
 There's no documentation at the moment, but each component has a property type that should give you an idea of what it expects for the properties.
 
+### Community Usage
+
+The usage of this library can be found in a few projects by the developer community. Here are a few plugins that use this library in some shape or form:
+
+- [LampLight](https://devforum.roblox.com/t/lamplight-global-illumination-for-roblox-new-v12/1837877) by @MrChickenRocket
+- [BenchMarker](https://devforum.roblox.com/t/benchmarker-plugin-compare-function-speeds-with-graphs-percentiles-and-more/829912) by @boatbomber
+- [MeshVox](https://devforum.roblox.com/t/meshvox-v10-a-powerful-3d-smooth-terrain-importstamping-tool/2576245) by @tyridge77
+
 ## PluginComponents
 
 These components use specific properties to create their corresponding plugin object. Afterwards, they use Hydrate on the created object and return it. You don't need to use these components, but the most useful one by far is the Widget component.
