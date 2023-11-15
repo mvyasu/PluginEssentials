@@ -1,3 +1,27 @@
+--[[
+	MIT License
+
+	Copyright (c) 2022 Yasu Yoshida
+
+	Permission is hereby granted, free of charge, to any person obtaining a copy
+	of this software and associated documentation files (the "Software"), to deal
+	in the Software without restriction, including without limitation the rights
+	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	copies of the Software, and to permit persons to whom the Software is
+	furnished to do so, subject to the following conditions:
+
+	The above copyright notice and this permission notice shall be included in all
+	copies or substantial portions of the Software.
+
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+	SOFTWARE.
+]]
+
 local Plugin = plugin
 
 local Components = script.Parent.Components
@@ -167,17 +191,24 @@ do --creates the example plugin
 		},
 		New "Frame" {
 			Name = "DropdownAlignment",
-			Size = UDim2.new(1, 0, 0, 25),
+			Size = UDim2.fromScale(1, 0),
 			BackgroundTransparency = 1,
-			[Children] = Dropdown {
-				Value = Value("Item1"),
-				Options = {"Item1", "Item2"},
-				AnchorPoint = Vector2.new(1, .5),
-				Position = UDim2.fromScale(1, .5),
-				Size = UDim2.fromScale(.5, 1),
-				OnSelected = function(newItem)
-					print("You've selected:", newItem)
-				end,
+			AutomaticSize = Enum.AutomaticSize.Y,
+			
+			[Children] = {
+				New "UIListLayout" {
+					HorizontalAlignment = Enum.HorizontalAlignment.Right,
+				},
+				
+				Dropdown {
+					Size = UDim2.new(.5, 0, 0, 25),
+
+					Value = Value("Item1"),
+					Options = {"Item1", "Item2"},
+					OnSelected = function(newItem)
+						print("You've selected:", newItem)
+					end,
+				}
 			}
 		},
 		Button {

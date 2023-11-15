@@ -124,8 +124,10 @@ return function(props: DropdownProperties): Frame
 		)
 	end)
 
-	local offsetDropdownHeaderSize = Computed(function()
+	local useableDropdownHeaderSize = Computed(function()
 		local currentHeaderAbsoluteSize = unwrap(dropdownHeaderAbsoluteSize)
+		local currentHeaderSize = unwrap(dropdownHeaderSize)
+		
 		return UDim2.fromOffset(currentHeaderAbsoluteSize.X, currentHeaderAbsoluteSize.Y)
 	end)
 
@@ -196,7 +198,7 @@ return function(props: DropdownProperties): Frame
 			if unwrap(isOpen) then
 				return dropdownContainerSize
 			end
-			return unwrap(offsetDropdownHeaderSize)
+			return unwrap(useableDropdownHeaderSize)
 		end),
 		
 		[Cleanup] = disconnectGetSelectedState,
@@ -209,7 +211,7 @@ return function(props: DropdownProperties): Frame
 				Name = "DropdownHeader",
 				BackgroundTransparency = 1,
 
-				Size = offsetDropdownHeaderSize,
+				Size = useableDropdownHeaderSize,
 
 				[OnEvent "InputBegan"] = function(inputObject)
 					if not unwrap(isEnabled) then
@@ -329,34 +331,91 @@ return function(props: DropdownProperties): Frame
 		},
 	}
 
-	do --this is a bit hacky, but it gets the size of the parent
-		local listenToParentAbsoluteSize = nil
-		local function cleanupListenToParentAbsoluteSize()
-			if listenToParentAbsoluteSize then
-				listenToParentAbsoluteSize:Disconnect()
-				listenToParentAbsoluteSize = nil
+	do --this is a bit hacky, but it gets the size of the parent and subtracts UIPadding
+		local listenToParentCleanupList = {}
+		local function cleanupObject(object: any)
+			local t = typeof(object)
+			if t == "function" then
+				object()
+			elseif t == "RBXScriptConnection" then
+				object:Disconnect()
+			elseif t == "table" or t =="Instance" then
+				if object.Destroy then
+					object:Destroy()
+				else
+					local cleanupList = table.clone(object)
+					table.clear(object)
+					
+					for _,child in cleanupList do
+						cleanupObject(child)
+					end
+				end
+			elseif t == "thread" then
+				coroutine.close(object)
 			end
 		end
 
 		local lastParent = nil
 		local function onAncestryChanged()
-			local currentParent = newDropdown.Parent
-			local previousParent = lastParent
+			local currentParent = newDropdown.Parent :: Instance
+			local previousParent = lastParent :: Instance?
 			lastParent = currentParent
 
 			if currentParent~=previousParent then
-				cleanupListenToParentAbsoluteSize()
+				cleanupObject(listenToParentCleanupList)
 
 				if currentParent==nil or not currentParent:IsA("GuiBase") then
 					return
 				end
 
-				local function onParentAbsoluteSizeChanged()
-					parentAbsoluteSize:set(currentParent.AbsoluteSize)
+				local function updateParentAbsoluteSize()
+					local currentUIPadding = currentParent:FindFirstChildOfClass("UIPadding") :: UIPadding
+					
+					local currentAbsoluteSize = if currentParent:IsA("ScrollingFrame") then currentParent.AbsoluteCanvasSize else currentParent.AbsoluteSize
+					local horizontalOffsetPadding = 0
+					local verticalOffsetPadding = 0
+					
+					if currentUIPadding then
+						local function paddingToOffset(padding: UDim, absoluteSize): number
+							return padding.Offset + padding.Scale * absoluteSize
+						end
+						
+						horizontalOffsetPadding = paddingToOffset(currentUIPadding.PaddingLeft, currentAbsoluteSize.X) + paddingToOffset(currentUIPadding.PaddingRight, currentAbsoluteSize.X)
+						verticalOffsetPadding = paddingToOffset(currentUIPadding.PaddingTop, currentAbsoluteSize.Y) + paddingToOffset(currentUIPadding.PaddingBottom, currentAbsoluteSize.Y)
+					end
+						
+					parentAbsoluteSize:set(Vector2.new(
+						math.max(0, currentAbsoluteSize.X - horizontalOffsetPadding),
+						math.max(0, currentAbsoluteSize.Y - verticalOffsetPadding)
+					))
 				end
-
-				listenToParentAbsoluteSize = currentParent:GetPropertyChangedSignal("AbsoluteSize"):Connect(onParentAbsoluteSizeChanged)
-				task.spawn(onParentAbsoluteSizeChanged)
+				
+				table.insert(listenToParentCleanupList, currentParent:GetPropertyChangedSignal(if currentParent:IsA("ScrollingFrame") then "AbsoluteCanvasSize" else "AbsoluteSize"):Connect(updateParentAbsoluteSize))
+				
+				local listenToUIPaddingCleanupList = {}
+				table.insert(listenToParentCleanupList, listenToUIPaddingCleanupList)
+				
+				local lastUIPadding = nil
+				local function onChildChanged()
+					local currentUIPadding = currentParent:FindFirstChildOfClass("UIPadding")
+					local previousUIPadding = lastUIPadding
+					lastUIPadding = currentUIPadding
+					
+					if currentUIPadding~=previousUIPadding then
+						cleanupObject(listenToUIPaddingCleanupList)
+						
+						if currentUIPadding==nil then
+							return
+						end
+						
+						table.insert(listenToUIPaddingCleanupList, currentUIPadding.Changed:Connect(updateParentAbsoluteSize))
+					end
+				end
+				
+				table.insert(listenToParentCleanupList, currentParent.ChildAdded:Connect(onChildChanged))
+				table.insert(listenToParentCleanupList, currentParent.ChildRemoved:Connect(onChildChanged))
+				
+				task.spawn(updateParentAbsoluteSize)
 			end
 		end
 
@@ -365,7 +424,9 @@ return function(props: DropdownProperties): Frame
 		Hydrate(newDropdown)({
 			[Cleanup] = {
 				newDropdown.AncestryChanged:Connect(onAncestryChanged),
-				cleanupListenToParentAbsoluteSize
+				function()
+					cleanupObject(listenToParentCleanupList)
+				end,
 			}
 		})
 	end
